@@ -21,7 +21,12 @@ public class Main {
 		
 		// Access
 		//char = board.get(row).charAt(col);
-		
+			
 		System.out.println("U R R UASDNJASNDJK");
 	} // main
+	
+	
+	public void parseBoard(Vector<String> board){
+		
+	}
 } // End Main

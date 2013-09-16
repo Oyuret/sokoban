@@ -9,3 +9,7 @@
 nbproject/
 manifest.mf
 build.xml
+
+#eclipse specific
+.classpath
+.project
