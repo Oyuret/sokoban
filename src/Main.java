@@ -1,16 +1,22 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Vector;
 
 
 public class Main {
+	static final int[] MOVE_X = {1,-1,0,0};
+	static final int[] MOVE_Y = {0,0,1,-1};
+	static final char[] MOVES = {'R','L','D','U'};
 
 	/**
 	 * @param args
 	 */
-	private char[][] board; //Easier access instead of string
+	private static char[][] board; //Easier access instead of string
 	private Map<State,Integer> visitedStates;
 	
 	public static void main(String[] args) throws IOException {
@@ -32,6 +38,46 @@ public class Main {
 	} // main
 	
 	
+	
+	/**
+	* Returns the path from a box from a goal
+	* It uses a Best First Search algorithm
+	* @param position
+	* @param goal
+	* @return the path to the goal, or null if it doesn't exit.
+	*/
+	public static String moveBox(Position boxPosition, Position goal){
+		assert(isBoxPosition(boxPosition)); //Just to be sure
+
+		// Initialization
+        PriorityQueue<BoxState> fringe= new PriorityQueue<BoxState>();
+        Set<BoxState> visitedStates = new HashSet<BoxState>();
+        
+        BoxState state0 = new BoxState(boxPosition, "", goal);
+        fringe.add(state0);
+        
+        //BEST FIRST SEARCH
+        while(fringe.size()>0){
+                //Pop new state
+                BoxState state = fringe.poll();
+                String path = state.getPath();
+                Position pos = state.getPosition();
+                visitedStates.add(state);
+                
+                //Check if arrived to goal
+                if(isGoal(pos))
+                    return path; 
+                else{ 
+                    List<BoxState> nextStates = state.getNextBoxStates();
+                    for(int i=0;i<nextStates.size();i++){
+                    	BoxState s = nextStates.get(i);
+                    	if(!visitedStates.contains(s)) //Add next States to the fringe if they are not visited
+                    			fringe.add(s);
+                    }
+                }
+        }//end while        
+		return null;
+	}
 	
 	/**
 	 * Solves the map and returns the path as a String
@@ -62,17 +108,7 @@ public class Main {
 	}
 	
 	
-	/**
-	 * Returns the path from a box from a goal
-	 * @param position
-	 * @param goal
-	 * @return the path to the goal, or null if it doesn't exit.
-	 */
-	public static String moveBox(Position boxPosition, Position goal){
-		//Check that boxPosition is actually a box
-		//Check that it has at least 2 white spaces in order to move it
-		return null;
-	}
+	
 	
 	/**
 	 * Checks if a box on a position pos[] (pos[0] and pos[1])
@@ -83,5 +119,22 @@ public class Main {
 	 */
 	public static boolean isIllegal(int[] pos){
 		return false;
+	}
+	
+	
+	
+	
+	/*---------------------HELPER FUNCTIONS------------------*/
+	public static boolean isEmptyPosition(Position p){
+		return board[p.getRow()][p.getCol()]!='#';
+	}
+	
+	public static boolean isBoxPosition(Position p){
+		char c = board[p.getRow()][p.getCol()]; 
+		return  c == '$' || c == '*'; 
+	}
+	
+	public static boolean isGoal(Position p){
+		return board[p.getRow()][p.getCol()] == '.';
 	}
 } // End Main
