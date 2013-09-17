@@ -6,7 +6,7 @@ public class State {
 	//Important to (re)define equals and hashcode methods!
 	
 	/**
-	 * Get possible stat
+	 * Get possible states
 	 * @param nextStates
 	 */
 	public void getNextMoves(List<State> nextStates){

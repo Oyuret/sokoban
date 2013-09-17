@@ -20,21 +20,18 @@ public class Main {
 	private Map<State,Integer> visitedStates;
 	
 	public static void main(String[] args) throws IOException {
-		Vector<String> board = new Vector<String>();
+		Vector<String> b = new Vector<String>();
 		
 		BufferedReader br = new BufferedReader(
 				new InputStreamReader(System.in));
 		
-		String line;
+		String line;	
+		
+		
 		while(br.ready()) {
 			line = br.readLine();
-			board.add(line);
+			b.add(line);
 		} // End while
-		
-		// Access
-		//char = board.get(row).charAt(col);
-			
-		System.out.println("U R R UASDNJASNDJK");
 	} // main
 	
 	
@@ -56,7 +53,7 @@ public class Main {
         BoxState state0 = new BoxState(boxPosition, "", goal);
         fringe.add(state0);
         
-        //BEST FIRST SEARCH
+        //BEST-FIRST SEARCH
         while(fringe.size()>0){
                 //Pop new state
                 BoxState state = fringe.poll();
@@ -67,7 +64,7 @@ public class Main {
                 //Check if arrived to goal
                 if(isGoal(pos))
                     return path; 
-                else{ 
+                else{ //Expand the state
                     List<BoxState> nextStates = state.getNextBoxStates();
                     for(int i=0;i<nextStates.size();i++){
                     	BoxState s = nextStates.get(i);

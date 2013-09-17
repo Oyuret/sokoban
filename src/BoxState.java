@@ -9,7 +9,6 @@ public class BoxState implements Comparable<BoxState> {
 	private Position goal;
 	
 	public BoxState(Position position,String path,Position goal) {
-		super();
 		this.position=position;
 		this.path=path;
 		this.goal=goal;
@@ -59,11 +58,15 @@ public class BoxState implements Comparable<BoxState> {
 	}
 
 
+	/**
+	 * Returns a list of all possible movements for a box given its current position
+	 * @return
+	 */
 	public List<BoxState> getNextBoxStates(){
 		int row = this.position.getRow();
 		int col = this.position.getCol();
 		List<BoxState> nextStates = new ArrayList<BoxState>();
-		for(int i=0;i<4;i++) {
+		for(int i=0;i<Main.MOVES.length;i++) {
 			Position newPos 		= new Position(row+Main.MOVE_Y[i],col+Main.MOVE_X[i]);
 			Position newPosOpposite = new Position(row-Main.MOVE_Y[i],col-Main.MOVE_X[i]);
 			if(Main.isEmptyPosition(newPos) && Main.isEmptyPosition(newPosOpposite))
@@ -72,8 +75,55 @@ public class BoxState implements Comparable<BoxState> {
 		return nextStates;
 	}
 
+	/**
+	 * Implement the Comparable Interface. This way the states will be automatically
+	 * ordered in the PriorityQueue in such a way that the first one is the closest to the goal.
+	 * This way we can implement Best-First Search.
+	 */
 	@Override
 	public int compareTo(BoxState o) {
 		return this.goalDistance-o.goalDistance;
 	}
+
+
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((goal == null) ? 0 : goal.hashCode());
+		result = prime * result
+				+ ((position == null) ? 0 : position.hashCode());
+		return result;
+	}
+
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BoxState other = (BoxState) obj;
+		if (goal == null) {
+			if (other.goal != null)
+				return false;
+		} else if (!goal.equals(other.goal))
+			return false;
+		if (position == null) {
+			if (other.position != null)
+				return false;
+		} else if (!position.equals(other.position))
+			return false;
+		return true;
+	}
+
+
+
+
 }
