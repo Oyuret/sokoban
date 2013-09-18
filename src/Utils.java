@@ -2,13 +2,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * This class holds diverse algorithms used by the program
+ * This class holds diverse algorithms used by the program. Statically declared
  * @author Yuri
  */
 public class Utils {
@@ -16,10 +11,10 @@ public class Utils {
     /**
      * This function tries to find a path from start to goal w/o
      * having to move any boxes
-     * @param start
-     * @param goal
-     * @return The path from start to goal w/o moving boxes or null if no such path exists
-     *
+     * @param start The start position
+     * @param goal The goal position
+     * @return The path from start to goal w/o moving boxes or null if no such path exists.
+     * Returns null if no path exists.
      */
     public static String findPath(Position start, Position goal, State currentState) {
         return null;
@@ -28,18 +23,22 @@ public class Utils {
     /**
      * Tries to move the box in the direction given by player -> box.
      * If this is possible it will return the path taken else null
-     * @param box
-     * @param player
-     * @param currentState
-     * @return The Movement which holds the new box position, the new player position and the path there
+     * @param box The positioning of the box
+     * @param player The positioning of the player
+     * @param currentState The current State
+     * @return The Movement which holds the new box position, the new player position and the path there.
+     * Returns null if the box cannot be moved.
      */
     public static Movement tryToMoveBox(Position box, Position player, State currentState) {
         
+        // the player's current row and column
         int row = player.getRow();
         int column = player.getCol();
         
         // for each possible direction
         for(int i=0; i<Main.MOVES.length; i++) {
+            
+            // the position the player would have if he moved (U D L R)
             Position adjucent = new Position(row + Main.MOVE_Y[i], column + Main.MOVE_X[i]);
             
             // if this position is where the box is
@@ -62,8 +61,10 @@ public class Utils {
     }
     
     /**
-     * Returns a list with all adjucent available positions to this box
-     * @return The list with all adjucent empty positions to this box
+     * Returns a list with all possible adjacent positions to a box
+     * @param box The position of the box
+     * @param currentState The current State of the game
+     * @return A list with all available (empty) adjacent positions to the box.
      */
     public static List<Position> getAdjucentPositions(Position box, State currentState) {
         
@@ -76,6 +77,8 @@ public class Utils {
         
         // for each possible adjucent position to the box
         for (int i=0; i < Main.MOVES.length; i++) {
+            
+            // the adjacent cell to this box (U D L R)
             Position pos = new Position(row + Main.MOVE_Y[i], col + Main.MOVE_X[i]);
             
             // check if this spot is empty or not

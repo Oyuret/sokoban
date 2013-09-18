@@ -13,3 +13,4 @@ build.xml
 #eclipse specific
 .classpath
 .project
+/build/

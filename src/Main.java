@@ -131,7 +131,7 @@ public class Main {
      * @param board
      * @author Carlos Perez
      */
-    public static void parseBoard(Vector<String> board) {
+    public static State parseBoard(Vector<String> board) {
         Main.board = new char[board.size()][lenghtMax];
 
         // Normal map, exactly the same than in Vector<String> board
@@ -218,7 +218,9 @@ public class Main {
                     visited.add(new Position(p.getRow(), p.getCol()));
                 }
             }
+            
         }
+        return null;
         
     }
 

@@ -15,8 +15,7 @@ public class State implements Cloneable {
         this.boxes = boxes;
         this.current_path = current_path;
     }
-
-    // Reimplement hashcode, Path Finding checking current position
+    
     /**
      * Fills up the given list with all possible new states which involve moving
      * a box
@@ -26,8 +25,10 @@ public class State implements Cloneable {
     public void getNextMoves(List<State> nextStates) {
 
         // for each box. Chech which boxes we can reach
+        // box : The current box we are looking at
         for (Position box : boxes) {
             // for each empty position adjucent to this box
+            // adjucent : the current adjucent position to the box
             for (Position adjucent : Utils.getAdjucentPositions(box, this)) {
                 // find out if we can reach it from our current position w/o
                 // moving any boxes
@@ -59,6 +60,7 @@ public class State implements Cloneable {
                             new_state.current_path = new StringBuilder(new_state.current_path).
                                     append(path_to_adjucent).append(moved_path.getPath()).toString();
 
+                            // add this state to the list to return
                             nextStates.add(new_state);
 
                         } catch (CloneNotSupportedException ex) {
@@ -70,6 +72,11 @@ public class State implements Cloneable {
         } // end for each box
     }
 
+    /**
+     * Calculates the hashcode of this state. Based only on the positioning
+     * of the boxes
+     * @return The hash of this state
+     */
     @Override
     public int hashCode() {
         int hash = 3;
@@ -79,6 +86,13 @@ public class State implements Cloneable {
         return hash;
     }
 
+    /**
+     * Checks if this State is equal to another. Two states are equal if they
+     * share the same box positionings and there is a path between the player
+     * positionings which doesn't move any boxes
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -101,21 +115,38 @@ public class State implements Cloneable {
             return false;
         }
 
+        // if we get here the states are equal
         return true;
     }
 
+    /**
+     * Returns a PriorityQueue containing the Positionings of the boxes
+     * @return The positioning of this State's boxes
+     */
     public PriorityQueue<Position> getBoxes() {
         return this.boxes;
     }
 
+    /**
+     * Returns this State's positioning of the player
+     * @return The positioning of the player
+     */
     public Position getPlayer() {
         return player;
     }
 
+    /**
+     * Returns the total path the player has taken up to this state
+     * @return The total path taken by the player
+     */
     public String getCurrent_path() {
         return current_path;
     }
 
+    /**
+     * Returns true if all boxes are standing on a goal, else false
+     * @return True if the game is finished
+     */
     public boolean finished() {
         boolean all = true;
 
