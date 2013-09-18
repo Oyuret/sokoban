@@ -21,8 +21,8 @@ public class Utils {
     }
     
     /**
-     * Tries to move the box in the direction given by player -> box.
-     * If this is possible it will return the path taken else null
+     * Tries to move the box in the direction given by player relative to box.
+     * If this is possible it will return a {@link Movement}, else null.
      * @param box The positioning of the box
      * @param player The positioning of the player
      * @param currentState The current State

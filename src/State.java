@@ -119,6 +119,20 @@ public class State implements Cloneable {
         return true;
     }
 
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        State result = (State) super.clone();
+        result.player = new Position(player.getRow(), player.getCol());
+        result.current_path = new String(current_path);
+        result.boxes = new PriorityQueue<>();
+        for(Position pos : boxes) {
+            result.boxes.add(new Position(pos.getRow(), pos.getCol()));
+        }
+        return result;
+   }
+    
+    
+
     /**
      * Returns a PriorityQueue containing the Positionings of the boxes
      * @return The positioning of this State's boxes
@@ -142,6 +156,20 @@ public class State implements Cloneable {
     public String getCurrent_path() {
         return current_path;
     }
+
+    public void setPlayer(Position player) {
+        this.player = player;
+    }
+
+    public void setBoxes(PriorityQueue<Position> boxes) {
+        this.boxes = boxes;
+    }
+
+    public void setCurrent_path(String current_path) {
+        this.current_path = current_path;
+    }
+    
+    
 
     /**
      * Returns true if all boxes are standing on a goal, else false
