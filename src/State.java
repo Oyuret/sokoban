@@ -1,16 +1,18 @@
 
 import java.util.List;
 import java.util.Objects;
+import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class State implements Cloneable {
     
     private Position player;
-    private List<Position> boxes;
+    private PriorityQueue<Position> boxes = new PriorityQueue<>();
     private String current_path;
+   
     
-    public State(Position player, List<Position> boxes, String current_path) {
+    public State(Position player, PriorityQueue<Position> boxes, String current_path) {
         this.player = player;
         this.boxes = boxes;
         this.current_path = current_path;
@@ -72,9 +74,10 @@ public class State implements Cloneable {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + Objects.hashCode(this.player);
-        hash = 97 * hash + Objects.hashCode(this.boxes);
+        int hash=3;
+        for(Position box : boxes) {
+            hash = hash*91 + box.hashCode();
+        }
         return hash;
     }
 
@@ -105,7 +108,7 @@ public class State implements Cloneable {
     
     
     
-    public List<Position> getBoxes() {
+    public PriorityQueue<Position> getBoxes() {
         return this.boxes;
     }
 
@@ -117,5 +120,16 @@ public class State implements Cloneable {
         return current_path;
     }
     
+    public boolean finished() {
+        boolean all=true;
+        
+        for(Position box : boxes) {
+            if(Main.board[box.getRow()][box.getCol()] != '.') {
+                all = false;
+            }
+        }
+        
+        return all;
+    }
     
 }
