@@ -91,7 +91,7 @@ public class State implements Cloneable {
      * share the same box positionings and there is a path between the player
      * positionings which doesn't move any boxes
      * @param obj
-     * @return 
+     * @return True if the States are "equal"
      */
     @Override
     public boolean equals(Object obj) {
