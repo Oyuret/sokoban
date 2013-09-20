@@ -1,4 +1,5 @@
 
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,23 +24,9 @@ public class Main {
     private static int lenghtMax; // max number of columns
 
     public static void main(String[] args) throws IOException {
-        Vector<String> b = new Vector<String>();
-        
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(System.in));
-        
-        String line;        
-        
-        lenghtMax = 0;
-        while (br.ready()) {
-            line = br.readLine();
-            b.add(line);
-            
-            if (lenghtMax < line.length()) {
-                lenghtMax = line.length();
-            }
-        } // End while
-        State first = parseBoard(b);
+    	Vector<String> b = new Vector<String>();
+        parseBoard(b, board);
+        State first = processBoard(board);
     } // main
 
     /**
@@ -125,14 +112,18 @@ public class Main {
     }
 
     /**
-     * Translate from Vector<String> to char[][] Check for corners and dangerous
-     * zones Updates the "board" (char[][]) attribute.
+     * Translate from Vector<String> to char[][].
+     * Modified:
+     *  Carlos Galvez=> pass the charBoard as a parameter,
+     *  so we can use this method with other boards (e.g.: tests) 
      *
      * @param board
+     * @param charBoard
      * @author Carlos Perez
+     * 
      */
-    public static State parseBoard(Vector<String> board) {
-        Main.board = new char[board.size()][lenghtMax];
+    public static void parseBoard(Vector<String> board, char[][] charBoard) {
+    	charBoard = new char[board.size()][lenghtMax];
 
         // Normal map, exactly the same than in Vector<String> board
         for (int row = 0; row < board.size(); row++) {
@@ -140,30 +131,40 @@ public class Main {
             int maxChar = datosF.length();
             for (int col = 0; col < lenghtMax; col++) {
                 if (col < maxChar) {
-                    Main.board[row][col] = datosF.charAt(col);
+                	charBoard[row][col] = datosF.charAt(col);
                 } else {
-                    Main.board[row][col] = ' ';
+                	charBoard[row][col] = ' ';
                 }
             }
         }
-
+    }
+    
+    /**
+     * Check for corners and dangerous
+     * zones Updates the "board" (char[][]) attribute.
+     * @param charBoard
+     * @return
+     * @author Carlos Perez
+     */
+    public static State processBoard(char[][] charBoard){ 
+        
         // Put c char in corners, C if there is the player in that space. Doesn't look at the borders of the map!
-        for (int row = 1; row < board.size() - 1; row++) {
+        for (int row = 1; row < charBoard.length - 1; row++) {
             for (int col = 1; col < lenghtMax - 1; col++) {
                 // Case space
-                if (Main.board[row][col] == (' ')) {
+                if (charBoard[row][col] == (' ')) {
                     // If theres one wall up or down and another wall right or left => it's a corner!
-                    if ((Main.board[row - 1][col] == ('#') || (Main.board[row + 1][col] == ('#')))
-                            && (Main.board[row][col - 1] == ('#') || (Main.board[row][col + 1] == ('#')))) {
-                        Main.board[row][col] = ('c');
+                    if ((charBoard[row - 1][col] == ('#') || (charBoard[row + 1][col] == ('#')))
+                            && (charBoard[row][col - 1] == ('#') || (charBoard[row][col + 1] == ('#')))) {
+                    	charBoard[row][col] = ('c');
                     }
                 }
                 // Case player
-                if (Main.board[row][col] == ('@')) {
+                if (charBoard[row][col] == ('@')) {
                     // If theres one wall up or down and another wall right or left => it's a corner!
-                    if ((Main.board[row - 1][col] == ('#') || (Main.board[row + 1][col] == ('#')))
-                            && (Main.board[row][col - 1] == ('#') || (Main.board[row][col + 1] == ('#')))) {
-                        Main.board[row][col] = ('C');
+                    if ((charBoard[row - 1][col] == ('#') || (charBoard[row + 1][col] == ('#')))
+                            && (charBoard[row][col - 1] == ('#') || (charBoard[row][col + 1] == ('#')))) {
+                    	charBoard[row][col] = ('C');
                     }
                 }
             }
@@ -175,17 +176,17 @@ public class Main {
         // This code may be moved to another method that would compare between two maps
         ArrayList<Position> queue = new ArrayList<Position>();
         ArrayList<Position> visited = new ArrayList<Position>();
-        for (int row = 0; row < board.size(); row++) {
+        for (int row = 0; row < charBoard.length; row++) {
             for (int col = 0; col < lenghtMax; col++) {
-                if (Main.board[row][col] == ('@')) {
+                if (charBoard[row][col] == ('@')) {
                     queue.add(new Position(row, col));
                     visited.add(new Position(row, col));
-                } else if (Main.board[row][col] == ('+')) {
-                    Main.board[row][col] = '.';
+                } else if (charBoard[row][col] == ('+')) {
+                	charBoard[row][col] = '.';
                     queue.add(new Position(row, col));
                     visited.add(new Position(row, col));
-                } else if (Main.board[row][col] == ('C')) {
-                    Main.board[row][col] = 'c';
+                } else if (charBoard[row][col] == ('C')) {
+                	charBoard[row][col] = 'c';
                     queue.add(new Position(row, col));
                     visited.add(new Position(row, col));
                 }
@@ -207,12 +208,12 @@ public class Main {
             
             for (Position p : pos) {
                 if (!visited.contains(p)) {
-                    if (Main.board[p.getRow()][p.getCol()] == (' ')) {
-                        Main.board[p.getRow()][p.getCol()] = 'x';
+                    if (charBoard[p.getRow()][p.getCol()] == (' ')) {
+                    	charBoard[p.getRow()][p.getCol()] = 'x';
                         queue.add(new Position(p.getRow(), p.getCol()));
-                    } else if (Main.board[p.getRow()][p.getCol()] == ('.')) {
+                    } else if (charBoard[p.getRow()][p.getCol()] == ('.')) {
                         queue.add(new Position(p.getRow(), p.getCol()));
-                    } else if (Main.board[p.getRow()][p.getCol()] == ('c')) {
+                    } else if (charBoard[p.getRow()][p.getCol()] == ('c')) {
                         queue.add(new Position(p.getRow(), p.getCol()));
                     }
                     visited.add(new Position(p.getRow(), p.getCol()));
@@ -245,6 +246,30 @@ public class Main {
     }
 
     /*---------------------HELPER FUNCTIONS------------------*/
+    /**
+     * Reads the map from System.in and stores it in a vector<String>
+     * 
+     * @param board
+     * @author Carlos Galvez
+     * @throws IOException 
+     */
+    public static void readMap(Vector<String> board) throws IOException{    	 
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));        
+        String line;                
+        lenghtMax = 0;
+        while (br.ready()) {
+            line = br.readLine();
+            board.add(line);            
+            if (lenghtMax < line.length()) {
+                lenghtMax = line.length();
+            }
+        } // End while
+    }
+    
+    public static void setMap(char[][]board){
+    	Main.board = board;
+    }
+    
     public static boolean isEmptyPosition(Position p) {
         return board[p.getRow()][p.getCol()] != '#';
     }

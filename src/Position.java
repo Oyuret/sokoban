@@ -1,4 +1,5 @@
 
+
 public class Position implements Comparable<Position> {
 
     private int row;
