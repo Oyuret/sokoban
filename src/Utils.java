@@ -2,10 +2,8 @@
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Queue;
 
 /**
  * This class holds diverse algorithms used by the program. Statically declared
@@ -13,6 +11,21 @@ import java.util.Queue;
  * @author Yuri
  */
 public class Utils {
+    
+    /**
+     * Tries to move a box from a starting position to a given goal. If there is
+     * no path for either the box or the player returns null. Else the path it
+     * took in order to move the box
+     * @param box The position of the box
+     * @param goal The position of the goal
+     * @param currentState The current state of the game
+     * @return The path the player took in order to move the box. Else null
+     */
+    public static Movement findBoxPathToGoal(Position box, Position goal, State currentState) {
+        Position player = currentState.getPlayer();
+        
+        return null;
+    }
 
     /**
      * This function tries to find a path from start to goal w/o having to move
@@ -27,20 +40,19 @@ public class Utils {
 
         // Fields used by the findPath algorithm
         HashSet<Position> visited = new HashSet<>();
-        Queue<Step> queue = new LinkedList<>();
         PriorityQueue<Step> prio = new PriorityQueue<>();
 
         // add the first position to the queue
-        queue.add(new Step(start, Position.manhattanDistance(start, goal), ""));
+        prio.add(new Step(start, Position.manhattanDistance(start, goal), ""));
 
         // set it as visited
         visited.add(start);
 
         // start the Best first search
-        while (!queue.isEmpty()) {
+        while (!prio.isEmpty()) {
 
             // Poll the head of this queue
-            Step currentStep = queue.poll();
+            Step currentStep = prio.poll();
             Position current = currentStep.getNext();
 
             // If we are there return the path
@@ -74,11 +86,6 @@ public class Utils {
 
                     // set it as visited
                     visited.add(next);
-
-                    // add them now to the queue in order=> Why??? You can use the PriorityQueue directly!!
-                    for(int i=0; i<prio.size(); i++) {
-                        queue.add(prio.poll());
-                    }
                     
                 } // end if we already visited this place
                 
