@@ -215,7 +215,7 @@ public class Main {
      */
     public static boolean isIllegal(State currentState) {
     	for(Position box : currentState.getBoxes()){
-	    	for(Position p : Utils.getAdjucentPositions(box, currentState)){
+	    	for(Position p : Utils.getAllAdjucentPositions(box, currentState)){
 	    		if(!Main.isEmptyPosition(p))
 	    			return true;
 	    	}    

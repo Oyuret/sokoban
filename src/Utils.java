@@ -1,5 +1,4 @@
 
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -11,11 +10,12 @@ import java.util.PriorityQueue;
  * @author Yuri
  */
 public class Utils {
-    
+
     /**
      * Tries to move a box from a starting position to a given goal. If there is
      * no path for either the box or the player returns null. Else the path it
      * took in order to move the box
+     *
      * @param box The position of the box
      * @param goal The position of the goal
      * @param currentState The current state of the game
@@ -23,7 +23,7 @@ public class Utils {
      */
     public static Movement findBoxPathToGoal(Position box, Position goal, State currentState) {
         Position player = currentState.getPlayer();
-        
+
         return null;
     }
 
@@ -74,7 +74,7 @@ public class Utils {
                     for (int i = 0; i < Main.MOVES.length; i++) {
                         if (next.getRow() == (current.getRow() + Main.MOVE_Y[i])
                                 && next.getCol() == (current.getCol() + Main.MOVE_X[i])) {
-                            
+
                             // Append the direction we moved on
                             direction.append(Main.MOVES[i]);
                         }
@@ -86,9 +86,9 @@ public class Utils {
 
                     // set it as visited
                     visited.add(next);
-                    
+
                 } // end if we already visited this place
-                
+
             } // end for all empty adjucent positions
 
         } // end the Best First Search
@@ -139,7 +139,7 @@ public class Utils {
     }
 
     /**
-     * Returns a list with all possible adjacent positions to a box
+     * Returns a list with all (empty) possible adjacent positions to a box
      *
      * @param box The position of the box
      * @param currentState The current State of the game
@@ -165,6 +165,28 @@ public class Utils {
                 // add it to the list
                 adjucent.add(pos);
             }
+        } // end adding positions
+
+        return adjucent;
+    }
+
+    public static List<Position> getAllAdjucentPositions(Position box, State currentState) {
+        // the row and column of this box
+        int row = box.getRow();
+        int col = box.getCol();
+
+        // the list to be returned with the valid adjucent positions
+        List<Position> adjucent = new ArrayList<>();
+
+        // for each possible adjucent position to the box
+        for (int i = 0; i < Main.MOVES.length; i++) {
+
+            // the adjacent cell to this box (U D L R)
+            Position pos = new Position(row + Main.MOVE_Y[i], col + Main.MOVE_X[i]);
+            
+            // add it to the list
+            adjucent.add(pos);
+
         } // end adding positions
 
         return adjucent;
