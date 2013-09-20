@@ -74,7 +74,7 @@ public class Utils {
                     // set it as visited
                     visited.add(next);
 
-                    // add them now to the queue in order
+                    // add them now to the queue in order=> Why??? You can use the PriorityQueue directly!!
                     for(int i=0; i<prio.size(); i++) {
                         queue.add(prio.poll());
                     }

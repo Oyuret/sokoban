@@ -98,7 +98,7 @@ public class Main {
         fringe.add(first);
         visitedStates.add(first);
 
-        //BEST-FIRST SEARCH
+        //BREADTH FIRST SEARCH
         while (fringe.size() > 0) {
             //Pop new state
             State state = fringe.poll();
