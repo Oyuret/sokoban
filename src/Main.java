@@ -21,10 +21,14 @@ public class Main {
      */
     static char[][] board; //Easier access instead of string
     private Map<State, Integer> visitedStates;
-    private static int lenghtMax; // max number of columns
-
+    private static int lengthMax; // max number of columns
+    static Set<Position> boxPositions;
+    
+    
     public static void main(String[] args) throws IOException {
     	Vector<String> b = new Vector<String>();
+    	readMap(b);
+    	board = new char[b.size()][lengthMax];
         parseBoard(b, board);
         State first = processBoard(board);
     } // main
@@ -122,15 +126,17 @@ public class Main {
      * @author Carlos Perez
      * 
      */
-    public static void parseBoard(Vector<String> board, char[][] charBoard) {
-    	charBoard = new char[board.size()][lenghtMax];
-
+    public static void parseBoard(Vector<String> board, char[][] charBoard) {    	
         // Normal map, exactly the same than in Vector<String> board
+    	boxPositions = new HashSet<Position>();
         for (int row = 0; row < board.size(); row++) {
             String datosF = board.get(row);
             int maxChar = datosF.length();
-            for (int col = 0; col < lenghtMax; col++) {
+            for (int col = 0; col < lengthMax; col++) {
                 if (col < maxChar) {
+                	char c = datosF.charAt(col);
+                	if(c == '$')
+                		boxPositions.add(new Position(row,col));
                 	charBoard[row][col] = datosF.charAt(col);
                 } else {
                 	charBoard[row][col] = ' ';
@@ -150,7 +156,7 @@ public class Main {
         
         // Put c char in corners, C if there is the player in that space. Doesn't look at the borders of the map!
         for (int row = 1; row < charBoard.length - 1; row++) {
-            for (int col = 1; col < lenghtMax - 1; col++) {
+            for (int col = 1; col < lengthMax - 1; col++) {
                 // Case space
                 if (charBoard[row][col] == (' ')) {
                     // If theres one wall up or down and another wall right or left => it's a corner!
@@ -177,7 +183,7 @@ public class Main {
         ArrayList<Position> queue = new ArrayList<Position>();
         ArrayList<Position> visited = new ArrayList<Position>();
         for (int row = 0; row < charBoard.length; row++) {
-            for (int col = 0; col < lenghtMax; col++) {
+            for (int col = 0; col < lengthMax; col++) {
                 if (charBoard[row][col] == ('@')) {
                     queue.add(new Position(row, col));
                     visited.add(new Position(row, col));
@@ -256,12 +262,12 @@ public class Main {
     public static void readMap(Vector<String> board) throws IOException{    	 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));        
         String line;                
-        lenghtMax = 0;
+        lengthMax = 0;
         while (br.ready()) {
             line = br.readLine();
             board.add(line);            
-            if (lenghtMax < line.length()) {
-                lenghtMax = line.length();
+            if (lengthMax < line.length()) {
+                lengthMax = line.length();
             }
         } // End while
     }
@@ -271,12 +277,15 @@ public class Main {
     }
     
     public static boolean isEmptyPosition(Position p) {
-        return board[p.getRow()][p.getCol()] != '#';
+    	char c = board[p.getRow()][p.getCol()];
+    	boolean result = c!= '#' && !isBoxPosition(p);
+        return result;
     }
     
     public static boolean isBoxPosition(Position p) {
-        char c = board[p.getRow()][p.getCol()];        
-        return c == '$' || c == '*';        
+        char c = board[p.getRow()][p.getCol()]; 
+        boolean result = c == '$' || c == '*';    
+        return result;     
     }
     
     public static boolean isGoal(Position p) {

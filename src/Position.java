@@ -35,7 +35,9 @@ public class Position implements Comparable<Position> {
      * @return The manhattan distance between two positions
      */
     public static int manhattanDistance(Position p1, Position p2) {
-        return Math.abs(p1.getCol() - p2.getCol()) + Math.abs(p1.getRow() - p2.getRow());
+    	if(p2!=null)
+    		return Math.abs(p1.getCol() - p2.getCol()) + Math.abs(p1.getRow() - p2.getRow());
+    	return -1;
     }
 
     /**
