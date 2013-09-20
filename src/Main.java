@@ -19,25 +19,26 @@ public class Main {
      * @param args
      */
     static char[][] board; //Easier access instead of string
-    private Map<State, Integer> visitedStates;
-    private static int lenghtMax; // max number of columns
+    private static int lengthMax; // max number of columns
+    static Set<Position> goals;
 
     public static void main(String[] args) throws IOException {
         Vector<String> b = new Vector<String>();
+        goals = new HashSet<Position>();
         
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(System.in));
         
         String line;        
         
-        lenghtMax = 0;
+        lengthMax = 0;
         while(!br.ready());
         while (br.ready()) {
             line = br.readLine();
             b.add(line);
             
-            if (lenghtMax < line.length()) {
-                lenghtMax = line.length();
+            if (lengthMax < line.length()) {
+                lengthMax = line.length();
             }
         } // End while
         State first = parseBoard(b);
@@ -96,7 +97,7 @@ public class Main {
     public static String solveMap(State first) {
     	System.out.println("Solve map");
         // Initialization
-        Queue<State> fringe = new LinkedList<>();
+        PriorityQueue<State> fringe = new PriorityQueue<State>();
         Set<State> visitedStates = new HashSet<>(10000);
         
         fringe.add(first);
@@ -119,7 +120,7 @@ public class Main {
             state.getNextMoves(nextStates);
             
             for (State next : nextStates) {
-                if(!visitedStates.contains(next)) {
+                if(!visitedStates.contains(next) && !isIllegal(next)) {
                     fringe.add(next);
                     visitedStates.add(next);
                 }
@@ -137,7 +138,7 @@ public class Main {
      * @author Carlos Perez
      */
     public static State parseBoard(Vector<String> board) {
-        Main.board = new char[board.size()][lenghtMax];
+        Main.board = new char[board.size()][lengthMax];
         
         Position player = null;
         PriorityQueue<Position> boxes = new PriorityQueue<Position>();
@@ -146,31 +147,36 @@ public class Main {
         for (int row = 0; row < board.size(); row++) {
             String datosF = board.get(row);
             int maxChar = datosF.length();
-            for (int col = 0; col < lenghtMax; col++) {
+            for (int col = 0; col < lengthMax; col++) {
                 if (col < maxChar) {
-                	
+                	char c = datosF.charAt(col);
                 	// Player
-                	if(datosF.charAt(col)=='@') {
+                	if(c=='@') {
                 		Main.board[row][col] = ' ';
                 		player = new Position(row,col);
                 		
                 	// Player on goal
-                	} else if(datosF.charAt(col)=='+') {
+                	} else if(c=='+') { //Player on goal
                 		Main.board[row][col] = '.';
                 		player = new Position(row,col);
+                		goals.add(new Position(row,col));
                 		
                 	// Box
-                	} else if(datosF.charAt(col)=='$') {
+                	} else if(c=='$') { //Box
                 		Main.board[row][col] = ' ';
                 		boxes.add(new Position(row,col));
                 		
                 	// Box on goal
-                	} else if(datosF.charAt(col)=='*') {
+                	} else if(c=='*') {//Box on goal
                 		Main.board[row][col] = '.';
                 		boxes.add(new Position(row,col));
+                		goals.add(new Position(row,col));
                 		
                 	// Normal Case
-                	} else {
+                	} else if(c=='.'){//Goal
+                		goals.add(new Position(row,col));
+                	}
+                	else {
                 		Main.board[row][col] = datosF.charAt(col);
                 	}
                 } else {
@@ -183,7 +189,7 @@ public class Main {
 
         // Put c char in corners,  Doesn't look at the borders of the map!
         for (int row = 1; row < board.size() - 1; row++) {
-            for (int col = 1; col < lenghtMax - 1; col++) {
+            for (int col = 1; col < lengthMax - 1; col++) {
                 // Case space
                 if (Main.board[row][col] == (' ')) {
                     // If theres one wall up or down and another wall right or left => it's a corner!
@@ -196,8 +202,7 @@ public class Main {
         }
        
         // First and initial State
-        return new State(player,boxes,"");
-        
+        return new State(player,boxes,"");        
     }
 
 
@@ -208,7 +213,13 @@ public class Main {
      * @param pos
      * @return true if there is any way to move that box
      */
-    public static boolean isIllegal(int[] pos) {
+    public static boolean isIllegal(State currentState) {
+    	for(Position box : currentState.getBoxes()){
+	    	for(Position p : Utils.getAdjucentPositions(box, currentState)){
+	    		if(!Main.isEmptyPosition(p))
+	    			return true;
+	    	}    
+    	}
         return false;
     }
 

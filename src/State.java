@@ -1,20 +1,23 @@
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class State implements Cloneable {
+public class State implements Cloneable, Comparable {
 
     private Position player;
     private PriorityQueue<Position> boxes = new PriorityQueue<>();
     private String current_path;
+    private int value;
 
     public State(Position player, PriorityQueue<Position> boxes, String current_path) {
         this.player = player;
         this.boxes = boxes;
         this.current_path = current_path;
+        this.value = 0;//stateHeuristic();
     }
     
     /**
@@ -177,7 +180,27 @@ public class State implements Cloneable {
      * @return
      */
     public int stateHeuristic() {
-        return -1;
+    	int sum=0;
+    	List<Position> boxesClone = new ArrayList<Position>();
+    	
+    	boxesClone.addAll(boxes);
+    	
+    	for(Position goal : Main.goals) {
+    		int min=Integer.MAX_VALUE;
+    		Position b = null;
+    		
+    		for(Position box: boxesClone){
+    			int d = Position.manhattanDistance(box, goal);
+    			if(d<min) {
+    				min=d;
+    				b=box;
+    			}
+    		}
+    		
+    		boxesClone.remove(b);
+    		sum+=min;
+    	}
+        return sum;
     }    
 
     /**
@@ -195,4 +218,11 @@ public class State implements Cloneable {
 
         return all;
     }
+
+	@Override
+	public int compareTo(Object o) {
+		// TODO Auto-generated method stub
+		State s = (State)o;
+		return this.value - s.value;
+	}
 }
