@@ -170,7 +170,15 @@ public class State implements Cloneable {
         this.current_path = current_path;
     }
     
-    
+    /**
+     * (FUTURE WORK, START WITH BFS) Estimate how good is a state
+     *
+     * @param state
+     * @return
+     */
+    public int stateHeuristic() {
+        return -1;
+    }    
 
     /**
      * Returns true if all boxes are standing on a goal, else false

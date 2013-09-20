@@ -57,7 +57,7 @@ public class Utils {
 
             // If we are there return the path
             if (current.equals(goal)) {
-                return currentStep.getPath().trim();
+                return currentStep.getPath();
             }
 
             // get all empty adjucent positions
@@ -76,7 +76,7 @@ public class Utils {
                                 && next.getCol() == (current.getCol() + Main.MOVE_X[i])) {
                             
                             // Append the direction we moved on
-                            direction.append(" ").append(Main.MOVES[i]);
+                            direction.append(Main.MOVES[i]);
                         }
                     }
 

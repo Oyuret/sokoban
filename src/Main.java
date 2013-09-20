@@ -31,6 +31,7 @@ public class Main {
         String line;        
         
         lenghtMax = 0;
+        while(!br.ready());
         while (br.ready()) {
             line = br.readLine();
             b.add(line);
@@ -40,6 +41,8 @@ public class Main {
             }
         } // End while
         State first = parseBoard(b);
+        String result = solveMap(first);
+        System.out.println("RESULT: " + result);
     } // main
 
     /**
@@ -91,6 +94,7 @@ public class Main {
      * @return
      */
     public static String solveMap(State first) {
+    	System.out.println("Solve map");
         // Initialization
         Queue<State> fringe = new LinkedList<>();
         Set<State> visitedStates = new HashSet<>(10000);
@@ -101,6 +105,7 @@ public class Main {
         //BEST-FIRST SEARCH
         while (fringe.size() > 0) {
             //Pop new state
+        	System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
             State state = fringe.poll();
             
             if (state.finished()) {
@@ -110,7 +115,7 @@ public class Main {
 
             //Check if arrived to goal
             //Expand the state
-            List<State> nextStates = new LinkedList<>();
+            List<State> nextStates = new ArrayList<State>();
             state.getNextMoves(nextStates);
             
             for (State next : nextStates) {
@@ -195,15 +200,7 @@ public class Main {
         
     }
 
-    /**
-     * (FUTURE WORK, START WITH BFS) Estimate how good is a state
-     *
-     * @param state
-     * @return
-     */
-    public static int stateHeuristic(State state) {
-        return -1;
-    }
+
 
     /**
      * Checks if a box on a position pos[] (pos[0] and pos[1]) can be moved.
