@@ -1,4 +1,5 @@
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -44,7 +45,7 @@ public class Utils {
 
             // If we are there return the path
             if (current.equals(goal)) {
-                return currentStep.getPath();
+                return currentStep.getPath().trim();
             }
 
             // get all empty adjucent positions
@@ -59,8 +60,8 @@ public class Utils {
 
                     // loop through Main.Moves to find out the direction we moved on
                     for (int i = 0; i < Main.MOVES.length; i++) {
-                        if (current.getRow() == (next.getRow() + Main.MOVE_Y[i])
-                                && current.getCol() == (next.getCol() + Main.MOVE_X[i])) {
+                        if (next.getRow() == (current.getRow() + Main.MOVE_Y[i])
+                                && next.getCol() == (current.getCol() + Main.MOVE_X[i])) {
                             
                             // Append the direction we moved on
                             direction.append(" ").append(Main.MOVES[i]);
@@ -74,7 +75,7 @@ public class Utils {
                     // set it as visited
                     visited.add(next);
 
-                    // add them now to the queue in order
+                    // add them now to the queue in order=> Why??? You can use the PriorityQueue directly!!
                     for(int i=0; i<prio.size(); i++) {
                         queue.add(prio.poll());
                     }
