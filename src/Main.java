@@ -1,6 +1,7 @@
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.Vector;
 
 public class Main {
@@ -42,8 +44,11 @@ public class Main {
             }
         } // End while
         State first = parseBoard(b);
+        for(int i=0;i<board.length;i++){
+        	//System.out.println(new String(board[i]));
+        }
         String result = solveMap(first);
-        System.out.println("RESULT: " + result);
+        System.out.println(result);
     } // main
 
     /**
@@ -95,9 +100,9 @@ public class Main {
      * @return
      */
     public static String solveMap(State first) {
-    	System.out.println("Solve map");
         // Initialization
         PriorityQueue<State> fringe = new PriorityQueue<State>();
+//    	Stack<State> fringe = new Stack<State>();
         Set<State> visitedStates = new HashSet<>(10000);
         
         fringe.add(first);
@@ -105,9 +110,11 @@ public class Main {
 
         //BEST-FIRST SEARCH
         while (fringe.size() > 0) {
+        	long start = new Date().getTime();
             //Pop new state
-        	System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
+//        	//System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
             State state = fringe.poll();
+//        	State state = fringe.pop();
             
             if (state.finished()) {
                 return state.getCurrent_path();
@@ -117,14 +124,15 @@ public class Main {
             //Check if arrived to goal
             //Expand the state
             List<State> nextStates = new ArrayList<State>();
-            state.getNextMoves(nextStates);
-            
+            state.getNextMoves(nextStates); //This takes ~1 ms on map 1, ~4ms on map 100.
             for (State next : nextStates) {
                 if(!visitedStates.contains(next) && !isIllegal(next)) {
                     fringe.add(next);
                     visitedStates.add(next);
                 }
             }
+            long end = new Date().getTime();
+            System.out.println("ITERATION TIME: "+(end-start)+" ms");
             
         }//end while        
         return null;
@@ -175,9 +183,10 @@ public class Main {
                 	// Normal Case
                 	} else if(c=='.'){//Goal
                 		goals.add(new Position(row,col));
+                		Main.board[row][col] = '.';
                 	}
                 	else {
-                		Main.board[row][col] = datosF.charAt(col);
+                		Main.board[row][col] = c;
                 	}
                 } else {
                     Main.board[row][col] = ' ';
@@ -214,13 +223,14 @@ public class Main {
      * @return true if there is any way to move that box
      */
     public static boolean isIllegal(State currentState) {
-    	for(Position box : currentState.getBoxes()){
-	    	for(Position p : Utils.getAllAdjucentPositions(box, currentState)){
-	    		if(!Main.isEmptyPosition(p))
-	    			return true;
-	    	}    
-    	}
-        return false;
+    	return false;
+//    	for(Position box : currentState.getBoxes()){
+//	    	for(Position p : Utils.getAllAdjucentPositions(box, currentState)){
+//	    		if(!Main.isEmptyPosition(p))
+//	    			return true;
+//	    	}    
+//    	}
+//        return false;
     }
 
     /*---------------------HELPER FUNCTIONS------------------*/

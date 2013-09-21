@@ -6,7 +6,9 @@ import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class State implements Cloneable, Comparable {
+import sun.rmi.runtime.NewThreadAction;
+
+public class State implements Cloneable, Comparable<State> {
 
     private Position player;
     private PriorityQueue<Position> boxes = new PriorityQueue<>();
@@ -17,7 +19,7 @@ public class State implements Cloneable, Comparable {
         this.player = player;
         this.boxes = boxes;
         this.current_path = current_path;
-        this.value = 0;//stateHeuristic();
+        this.value = stateHeuristic();
     }
     
     /**
@@ -64,6 +66,7 @@ public class State implements Cloneable, Comparable {
                             new_state.current_path = new StringBuilder(new_state.current_path).
                                     append(path_to_adjucent).append(moved_path.getPath()).toString();
 
+                            new_state.updateValue();
                             // add this state to the list to return
                             nextStates.add(new_state);
 
@@ -202,27 +205,27 @@ public class State implements Cloneable, Comparable {
     	}
         return sum;
     }    
+    
+    public void updateValue(){
+    	this.value = stateHeuristic();
+    }
 
     /**
      * Returns true if all boxes are standing on a goal, else false
      * @return True if the game is finished
      */
     public boolean finished() {
-        boolean all = true;
-
         for (Position box : boxes) {
             if (!Main.isGoal(box)) {
-                all = false;
+                return false;
             }
         }
-
-        return all;
+        return true;
     }
 
 	@Override
-	public int compareTo(Object o) {
+	public int compareTo(State o) {
 		// TODO Auto-generated method stub
-		State s = (State)o;
-		return this.value - s.value;
+		return this.value - o.value;
 	}
 }
