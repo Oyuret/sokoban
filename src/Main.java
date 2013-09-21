@@ -34,18 +34,22 @@ public class Main {
         String line;        
         
         lengthMax = 0;
-        while(!br.ready());
+//        while(!br.ready());
         while (br.ready()) {
             line = br.readLine();
+//            System.out.println(line);
             b.add(line);
             
             if (lengthMax < line.length()) {
                 lengthMax = line.length();
             }
         } // End while
+        long s = new Date().getTime();
         State first = parseBoard(b);
+        long e = new Date().getTime();
+        System.out.println("Time parse board: "+(e-s)+" ms");
         for(int i=0;i<board.length;i++){
-        	//System.out.println(new String(board[i]));
+//        	System.out.println(new String(board[i]));
         }
         String result = solveMap(first);
         System.out.println(result);
@@ -132,7 +136,7 @@ public class Main {
                 }
             }
             long end = new Date().getTime();
-            System.out.println("ITERATION TIME: "+(end-start)+" ms");
+//            System.out.println("ITERATION TIMAR: "+(end-start)+" ms");
             
         }//end while        
         return null;
@@ -201,11 +205,20 @@ public class Main {
             for (int col = 1; col < lengthMax - 1; col++) {
                 // Case space
                 if (Main.board[row][col] == (' ')) {
-                    // If theres one wall up or down and another wall right or left => it's a corner!
-                    if ((Main.board[row - 1][col] == ('#') || (Main.board[row + 1][col] == ('#')))
-                            && (Main.board[row][col - 1] == ('#') || (Main.board[row][col + 1] == ('#')))) {
-                        Main.board[row][col] = ('c');
+//                    // If theres one wall up or down and another wall right or left => it's a corner!
+//                    if ((Main.board[row - 1][col] == ('#') || (Main.board[row + 1][col] == ('#')))
+//                            && (Main.board[row][col - 1] == ('#') || (Main.board[row][col + 1] == ('#')))) {
+//                        Main.board[row][col] = ('c');
+//                    }
+                    boolean isPath=false;
+                    for(Position g : goals){
+                    	if(moveBox(new Position(row, col), g)!=null){
+                    		isPath=true;
+                    		break;
+                    	}
                     }
+                    if(!isPath)
+                    	Main.board[row][col] = 'x';
                 }
             }
         }
@@ -234,15 +247,23 @@ public class Main {
     }
 
     /*---------------------HELPER FUNCTIONS------------------*/
-    public static boolean isEmptyPosition(Position p) {
-        return board[p.getRow()][p.getCol()] != '#';
+    public static boolean isEmptyPosition(Position p) {    	
+        return  board[p.getRow()][p.getCol()]!= '#';
     }
     
+    public static boolean isSafePosition(Position p){
+    	 return board[p.getRow()][p.getCol()] !='x';
+    }
     public static boolean isBoxPosition(Position p) {
         char c = board[p.getRow()][p.getCol()];        
         return c == '$' || c == '*';        
     }
     
+    public static boolean isValidPosition(Position p){
+    	int row = p.getRow();
+    	int col = p.getCol();
+    	return (row>=0 && col>=0 && row<board.length && col<board[0].length);
+    }
     public static boolean isGoal(Position p) {
         return board[p.getRow()][p.getCol()] == '.';
     }

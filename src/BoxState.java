@@ -54,7 +54,7 @@ public class BoxState implements Comparable<BoxState> {
         for (int i = 0; i < Main.MOVES.length; i++) {
             Position newPos = new Position(row + Main.MOVE_Y[i], col + Main.MOVE_X[i]);
             Position newPosOpposite = new Position(row - Main.MOVE_Y[i], col - Main.MOVE_X[i]);
-            if (Main.isEmptyPosition(newPos) && Main.isEmptyPosition(newPosOpposite)) {
+            if (Main.isValidPosition(newPos) && Main.isValidPosition(newPosOpposite) && Main.isSafePosition(newPos) && Main.isEmptyPosition(newPosOpposite)) {
                 nextStates.add(new BoxState(newPos, new StringBuilder(path).append(Main.MOVES[i]).toString(), this.goal));
             }
         }
