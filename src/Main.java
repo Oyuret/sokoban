@@ -1,6 +1,7 @@
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,7 +35,7 @@ public class Main {
         String line;
 
         lengthMax = 0;
-//        while(!br.ready());
+        while(!br.ready());
         while (br.ready()) {
             line = br.readLine();
 //            System.out.println(line);
@@ -52,6 +53,8 @@ public class Main {
 //        	System.out.println(new String(board[i]));
         }
         String result = solveMap(first);
+        long f = new Date().getTime();
+        System.out.println("Total time: " + (f-s));
         System.out.println(result);
     } // main
 
@@ -116,7 +119,7 @@ public class Main {
         while (fringe.size() > 0) {
             long start = new Date().getTime();
             //Pop new state
-//        	//System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
+        	System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
             State state = fringe.poll();
 //        	State state = fringe.pop();
 
@@ -130,7 +133,7 @@ public class Main {
             List<State> nextStates = new ArrayList<State>();
             state.getNextMoves(nextStates); //This takes ~1 ms on map 1, ~4ms on map 100.
             for (State next : nextStates) {
-                if (!visitedStates.contains(next) && !isIllegal(next)) {
+                if (!visitedStates.contains(next) && isValidMove(next)) {
                     fringe.add(next);
                     visitedStates.add(next);
                 }
@@ -264,6 +267,93 @@ public class Main {
         int row = p.getRow();
         int col = p.getCol();
         return (row >= 0 && col >= 0 && row < board.length && col < board[0].length);
+    }
+    
+    public static Position getLastMove(State current) {
+        Position player = current.getPlayer();
+        Position lastMovedBox = new Position(0,0);
+        char lastMove = current.getCurrent_path().charAt(current.getCurrent_path().length()-1);
+        
+        if(lastMove == 'U') {
+            lastMovedBox = new Position(player.getRow()-1, player.getCol());
+        } else if(lastMove == 'D') {
+            lastMovedBox = new Position(player.getRow()+1, player.getCol());
+        } else if(lastMove == 'L') {
+            lastMovedBox = new Position(player.getRow(), player.getCol()-1);
+        } else if(lastMove == 'R') {
+            lastMovedBox = new Position(player.getRow(), player.getCol()+1);
+        }
+        return lastMovedBox;
+    }
+    
+    public static boolean isValidMove(State current) {
+        
+        // get the position of the last moved box
+        Position box = getLastMove(current);
+        
+        int rel_row = box.getRow();
+        int rel_col = box.getCol();
+        
+        // create the board we will play with
+        char[][] tmpBoard = new char[5][5];
+        
+        for(int i=0; i<5; i++) {
+            for(int j=0; j<5; j++) {
+                tmpBoard[i][j] = ' ';
+            }
+        }
+        
+        // store all relevant positions to the box
+        ArrayList<Position> positions = new ArrayList<>();
+        
+        for(int i=box.getRow()-1, x=1; i<=box.getRow()+1; i++, x++) {
+            for(int j= box.getCol()-1, y=1; j<=box.getCol()+1; j++, y++) {
+                tmpBoard[x][y] = board[i][j];
+                positions.add(new Position(i,j));
+            }
+        }
+        
+        
+        // for each relevant position
+        for(Position pos : positions) {
+            
+            // if it's really a box
+            if(current.getBoxes().contains(pos)) {
+                tmpBoard[pos.getRow()-rel_row+2][pos.getCol()-rel_col+2] = '$';
+            }
+        }
+        
+        // check all boxes in the tmpBoard
+        boolean allOk = false;
+        for(int i=0; i<5; i++) {
+            for(int j=0; j<5; j++) {
+                if(tmpBoard[i][j] == '$') {
+                    boolean thisOk = false;
+                    if((tmpBoard[i-1][j]!= '#' && tmpBoard[i-1][j] != '$') && (tmpBoard[i+1][j]!= '#' && tmpBoard[i+1][j] != '$')) {
+                        thisOk = true;
+                    }
+                    if((tmpBoard[i][j-1]!= '#' && tmpBoard[i][j-1] != '$') && (tmpBoard[i][j+1]!= '#' && tmpBoard[i][j+1] != '$')) {
+                        thisOk = true;
+                    }
+                    if(thisOk) {
+                        allOk = true;
+                    }
+                }
+            }
+        }
+        
+        // if all boxes are on goals, don't fail this state
+        boolean allBoxesOngoals = true;
+        for(Position pos : positions) {
+            if(current.getBoxes().contains(pos)) {
+                if(!goals.contains(pos)) {
+                    allBoxesOngoals = false;
+                }
+            }
+        }
+        
+        
+        return allOk || allBoxesOngoals;
     }
 
     // Returns true if this position is a goal
