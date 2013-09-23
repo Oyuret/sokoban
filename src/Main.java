@@ -27,19 +27,19 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Vector<String> b = new Vector<String>();
         goals = new HashSet<Position>();
-        
+
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(System.in));
-        
-        String line;        
-        
+
+        String line;
+
         lengthMax = 0;
 //        while(!br.ready());
         while (br.ready()) {
             line = br.readLine();
 //            System.out.println(line);
             b.add(line);
-            
+
             if (lengthMax < line.length()) {
                 lengthMax = line.length();
             }
@@ -47,8 +47,8 @@ public class Main {
         long s = new Date().getTime();
         State first = parseBoard(b);
         long e = new Date().getTime();
-        System.out.println("Time parse board: "+(e-s)+" ms");
-        for(int i=0;i<board.length;i++){
+        System.out.println("Time parse board: " + (e - s) + " ms");
+        for (int i = 0; i < board.length; i++) {
 //        	System.out.println(new String(board[i]));
         }
         String result = solveMap(first);
@@ -69,7 +69,7 @@ public class Main {
         // Initialization
         PriorityQueue<BoxState> fringe = new PriorityQueue<BoxState>();
         Set<BoxState> visitedStates = new HashSet<BoxState>();
-        
+
         BoxState state0 = new BoxState(boxPosition, "", goal);
         fringe.add(state0);
 
@@ -108,36 +108,36 @@ public class Main {
         PriorityQueue<State> fringe = new PriorityQueue<State>();
 //    	Stack<State> fringe = new Stack<State>();
         Set<State> visitedStates = new HashSet<>(10000);
-        
+
         fringe.add(first);
         visitedStates.add(first);
 
         //BEST-FIRST SEARCH
         while (fringe.size() > 0) {
-        	long start = new Date().getTime();
+            long start = new Date().getTime();
             //Pop new state
 //        	//System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
             State state = fringe.poll();
 //        	State state = fringe.pop();
-            
+
             if (state.finished()) {
                 return state.getCurrent_path();
             }
-           
+
 
             //Check if arrived to goal
             //Expand the state
             List<State> nextStates = new ArrayList<State>();
             state.getNextMoves(nextStates); //This takes ~1 ms on map 1, ~4ms on map 100.
             for (State next : nextStates) {
-                if(!visitedStates.contains(next) && !isIllegal(next)) {
+                if (!visitedStates.contains(next) && !isIllegal(next)) {
                     fringe.add(next);
                     visitedStates.add(next);
                 }
             }
             long end = new Date().getTime();
 //            System.out.println("ITERATION TIMAR: "+(end-start)+" ms");
-            
+
         }//end while        
         return null;
     }
@@ -151,7 +151,7 @@ public class Main {
      */
     public static State parseBoard(Vector<String> board) {
         Main.board = new char[board.size()][lengthMax];
-        
+
         Position player = null;
         PriorityQueue<Position> boxes = new PriorityQueue<Position>();
 
@@ -161,44 +161,43 @@ public class Main {
             int maxChar = datosF.length();
             for (int col = 0; col < lengthMax; col++) {
                 if (col < maxChar) {
-                	char c = datosF.charAt(col);
-                	// Player
-                	if(c=='@') {
-                		Main.board[row][col] = ' ';
-                		player = new Position(row,col);
-                		
-                	// Player on goal
-                	} else if(c=='+') { //Player on goal
-                		Main.board[row][col] = '.';
-                		player = new Position(row,col);
-                		goals.add(new Position(row,col));
-                		
-                	// Box
-                	} else if(c=='$') { //Box
-                		Main.board[row][col] = ' ';
-                		boxes.add(new Position(row,col));
-                		
-                	// Box on goal
-                	} else if(c=='*') {//Box on goal
-                		Main.board[row][col] = '.';
-                		boxes.add(new Position(row,col));
-                		goals.add(new Position(row,col));
-                		
-                	// Normal Case
-                	} else if(c=='.'){//Goal
-                		goals.add(new Position(row,col));
-                		Main.board[row][col] = '.';
-                	}
-                	else {
-                		Main.board[row][col] = c;
-                	}
+                    char c = datosF.charAt(col);
+                    // Player
+                    if (c == '@') {
+                        Main.board[row][col] = ' ';
+                        player = new Position(row, col);
+
+                        // Player on goal
+                    } else if (c == '+') { //Player on goal
+                        Main.board[row][col] = '.';
+                        player = new Position(row, col);
+                        goals.add(new Position(row, col));
+
+                        // Box
+                    } else if (c == '$') { //Box
+                        Main.board[row][col] = ' ';
+                        boxes.add(new Position(row, col));
+
+                        // Box on goal
+                    } else if (c == '*') {//Box on goal
+                        Main.board[row][col] = '.';
+                        boxes.add(new Position(row, col));
+                        goals.add(new Position(row, col));
+
+                        // Normal Case
+                    } else if (c == '.') {//Goal
+                        goals.add(new Position(row, col));
+                        Main.board[row][col] = '.';
+                    } else {
+                        Main.board[row][col] = c;
+                    }
                 } else {
                     Main.board[row][col] = ' ';
                 }
             }
         }
-        
-    
+
+
 
         // Put c char in corners,  Doesn't look at the borders of the map!
         for (int row = 1; row < board.size() - 1; row++) {
@@ -210,24 +209,23 @@ public class Main {
 //                            && (Main.board[row][col - 1] == ('#') || (Main.board[row][col + 1] == ('#')))) {
 //                        Main.board[row][col] = ('c');
 //                    }
-                    boolean isPath=false;
-                    for(Position g : goals){
-                    	if(moveBox(new Position(row, col), g)!=null){
-                    		isPath=true;
-                    		break;
-                    	}
+                    boolean isPath = false;
+                    for (Position g : goals) {
+                        if (moveBox(new Position(row, col), g) != null) {
+                            isPath = true;
+                            break;
+                        }
                     }
-                    if(!isPath)
-                    	Main.board[row][col] = 'x';
+                    if (!isPath) {
+                        Main.board[row][col] = 'x';
+                    }
                 }
             }
         }
-       
+
         // First and initial State
-        return new State(player,boxes,"");        
+        return new State(player, boxes, "");
     }
-
-
 
     /**
      * Checks if a box on a position pos[] (pos[0] and pos[1]) can be moved.
@@ -236,7 +234,7 @@ public class Main {
      * @return true if there is any way to move that box
      */
     public static boolean isIllegal(State currentState) {
-    	return false;
+        return false;
 //    	for(Position box : currentState.getBoxes()){
 //	    	for(Position p : Utils.getAllAdjucentPositions(box, currentState)){
 //	    		if(!Main.isEmptyPosition(p))
@@ -247,24 +245,29 @@ public class Main {
     }
 
     /*---------------------HELPER FUNCTIONS------------------*/
-    public static boolean isEmptyPosition(Position p) {    	
-        return  board[p.getRow()][p.getCol()]!= '#';
+    public static boolean isEmptyPosition(Position p) {
+        return board[p.getRow()][p.getCol()] != '#';
     }
-    
-    public static boolean isSafePosition(Position p){
-    	 return board[p.getRow()][p.getCol()] !='x';
+
+    // Returns true if the position is considered "safe"
+    // A position which contains a goal should always be considered safe.
+    public static boolean isSafePosition(Position p) {
+        return board[p.getRow()][p.getCol()] != 'x' || isGoal(p);
     }
+
     public static boolean isBoxPosition(Position p) {
-        char c = board[p.getRow()][p.getCol()];        
-        return c == '$' || c == '*';        
+        char c = board[p.getRow()][p.getCol()];
+        return c == '$' || c == '*';
     }
-    
-    public static boolean isValidPosition(Position p){
-    	int row = p.getRow();
-    	int col = p.getCol();
-    	return (row>=0 && col>=0 && row<board.length && col<board[0].length);
+
+    public static boolean isValidPosition(Position p) {
+        int row = p.getRow();
+        int col = p.getCol();
+        return (row >= 0 && col >= 0 && row < board.length && col < board[0].length);
     }
+
+    // Returns true if this position is a goal
     public static boolean isGoal(Position p) {
-        return board[p.getRow()][p.getCol()] == '.';
+        return goals.contains(p);
     }
 } // End Main
