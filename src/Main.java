@@ -48,13 +48,13 @@ public class Main {
         long s = new Date().getTime();
         State first = parseBoard(b);
         long e = new Date().getTime();
-        System.out.println("Time parse board: " + (e - s) + " ms");
+        //System.out.println("Time parse board: " + (e - s) + " ms");
         for (int i = 0; i < board.length; i++) {
 //        	System.out.println(new String(board[i]));
         }
         String result = solveMap(first);
         long f = new Date().getTime();
-        System.out.println("Total time: " + (f-s));
+        //System.out.println("Total time: " + (f-s));
         System.out.println(result);
     } // main
 
@@ -119,7 +119,7 @@ public class Main {
         while (fringe.size() > 0) {
             long start = new Date().getTime();
             //Pop new state
-        	System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
+        	//System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
             State state = fringe.poll();
 //        	State state = fringe.pop();
 
