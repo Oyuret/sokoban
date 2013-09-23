@@ -219,6 +219,7 @@ public class State implements Cloneable, Comparable<State> {
     			}
 			}
     		goalsClone.remove(g);
+    		sum+=min;
 		}
     	
         return sum;
