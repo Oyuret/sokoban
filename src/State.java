@@ -185,24 +185,42 @@ public class State implements Cloneable, Comparable<State> {
     public int stateHeuristic() {
     	int sum=0;
     	List<Position> boxesClone = new ArrayList<Position>();
-    	
+    	List<Position> goalsClone = new ArrayList<Position>();
     	boxesClone.addAll(boxes);
+    	goalsClone.addAll(Main.goals);
+//    	for(Position goal : Main.goals) {
+//    		int min=Integer.MAX_VALUE;
+//    		Position b = null;
+//    		
+//    		for(Position box: boxesClone){
+//    			int d = Position.manhattanDistance(box, goal);
+//    			if(d<min) {
+//    				min=d;
+//    				b=box;
+//    			}
+//    		}
+//    		
+//    		boxesClone.remove(b);
+//    		sum+=min;
+//    	}
     	
-    	for(Position goal : Main.goals) {
-    		int min=Integer.MAX_VALUE;
-    		Position b = null;
-    		
-    		for(Position box: boxesClone){
+    	// With this new implementation two close goals won't take the same box
+    	// It's a little more efficient because it'll assign always boxes and goals that are in the same position
+    	int min=Integer.MAX_VALUE;
+    	for(Position box: boxesClone){
+    		if(Main.goals.contains(box)) continue; // We don't have to add any punctuation
+    		Position g = null;
+    		for(Position goal : goalsClone) {
+    			if(boxesClone.contains(goal)) continue; //There is another box in this goal
     			int d = Position.manhattanDistance(box, goal);
     			if(d<min) {
     				min=d;
-    				b=box;
+    				g=goal;
     			}
-    		}
-    		
-    		boxesClone.remove(b);
-    		sum+=min;
-    	}
+			}
+    		goalsClone.remove(g);
+		}
+    	
         return sum;
     }    
     
