@@ -133,7 +133,7 @@ public class Main {
             List<State> nextStates = new ArrayList<State>();
             state.getNextMoves(nextStates); //This takes ~1 ms on map 1, ~4ms on map 100.
             for (State next : nextStates) {
-                if (!visitedStates.contains(next) && isValidMove(next)) {
+                if (!visitedStates.contains(next) && isValidMove(next) && isSafePosition(getLastMove(next))) {
                     fringe.add(next);
                     visitedStates.add(next);
                 }
