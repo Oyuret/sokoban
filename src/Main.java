@@ -35,7 +35,7 @@ public class Main {
         String line;
 
         lengthMax = 0;
-        while(!br.ready());
+        //while(!br.ready());
         while (br.ready()) {
             line = br.readLine();
 //            System.out.println(line);
