@@ -195,6 +195,6 @@ public class TestMap {
     }
     
     public static void main(String[] args) throws FileNotFoundException, IOException{
-        System.out.println("is solved: " + TestMap.testSolution(22, "DDDRR", true));
+        System.out.println("is solved: " + TestMap.testSolution(-1, "RRDDDDRDDLLURDRULURRRLLLUUUULLDRURDDDDRDDLLURURRRDRUUDLLLLDDRULURRRDRULLLLUUULLDRURDDDRDDLLURDRULURRR", true));
     }
 }

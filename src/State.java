@@ -1,12 +1,9 @@
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import sun.rmi.runtime.NewThreadAction;
 
 public class State implements Cloneable, Comparable<State> {
 
@@ -21,7 +18,7 @@ public class State implements Cloneable, Comparable<State> {
         this.current_path = current_path;
         this.value = stateHeuristic();
     }
-    
+
     /**
      * Fills up the given list with all possible new states which involve moving
      * a box
@@ -80,8 +77,9 @@ public class State implements Cloneable, Comparable<State> {
     }
 
     /**
-     * Calculates the hashcode of this state. Based only on the positioning
-     * of the boxes
+     * Calculates the hashcode of this state. Based only on the positioning of
+     * the boxes
+     *
      * @return The hash of this state
      */
     @Override
@@ -97,6 +95,7 @@ public class State implements Cloneable, Comparable<State> {
      * Checks if this State is equal to another. Two states are equal if they
      * share the same box positionings and there is a path between the player
      * positionings which doesn't move any boxes
+     *
      * @param obj
      * @return True if the States are "equal"
      */
@@ -132,16 +131,15 @@ public class State implements Cloneable, Comparable<State> {
         result.player = new Position(player.getRow(), player.getCol());
         result.current_path = new String(current_path);
         result.boxes = new PriorityQueue<>();
-        for(Position pos : boxes) {
+        for (Position pos : boxes) {
             result.boxes.add(new Position(pos.getRow(), pos.getCol()));
         }
         return result;
-   }
-    
-    
+    }
 
     /**
      * Returns a PriorityQueue containing the Positionings of the boxes
+     *
      * @return The positioning of this State's boxes
      */
     public PriorityQueue<Position> getBoxes() {
@@ -150,6 +148,7 @@ public class State implements Cloneable, Comparable<State> {
 
     /**
      * Returns this State's positioning of the player
+     *
      * @return The positioning of the player
      */
     public Position getPlayer() {
@@ -158,6 +157,7 @@ public class State implements Cloneable, Comparable<State> {
 
     /**
      * Returns the total path the player has taken up to this state
+     *
      * @return The total path taken by the player
      */
     public String getCurrent_path() {
@@ -175,7 +175,7 @@ public class State implements Cloneable, Comparable<State> {
     public void setCurrent_path(String current_path) {
         this.current_path = current_path;
     }
-    
+
     /**
      * (FUTURE WORK, START WITH BFS) Estimate how good is a state
      *
@@ -183,35 +183,65 @@ public class State implements Cloneable, Comparable<State> {
      * @return
      */
     public int stateHeuristic() {
-    	int sum=0;
-    	List<Position> boxesClone = new ArrayList<Position>();
-    	
-    	boxesClone.addAll(boxes);
-    	
-    	for(Position goal : Main.goals) {
-    		int min=Integer.MAX_VALUE;
-    		Position b = null;
-    		
-    		for(Position box: boxesClone){
-    			int d = Position.manhattanDistance(box, goal);
-    			if(d<min) {
-    				min=d;
-    				b=box;
-    			}
-    		}
-    		
-    		boxesClone.remove(b);
-    		sum+=min;
-    	}
+        int sum = 0;
+        List<Position> boxesClone = new ArrayList<Position>();
+        List<Position> goalsClone = new ArrayList<Position>();
+        boxesClone.addAll(boxes);
+        goalsClone.addAll(Main.goals);
+//    	for(Position goal : Main.goals) {
+//    		int min=Integer.MAX_VALUE;
+//    		Position b = null;
+//    		
+//    		for(Position box: boxesClone){
+//    			int d = Position.manhattanDistance(box, goal);
+//    			if(d<min) {
+//    				min=d;
+//    				b=box;
+//    			}
+//    		}
+//    		
+//    		boxesClone.remove(b);
+//    		sum+=min;
+//    	}
+
+        // With this new implementation two close goals won't take the same box
+        // It's a little more efficient because it'll assign always boxes and goals that are in the same position
+        int min = Integer.MAX_VALUE;
+        for (Position box : boxesClone) {
+            if (Main.goals.contains(box)) {
+                continue; // We don't have to add any punctuation
+            }
+            Position g = null;
+            for (Position goal : goalsClone) {
+                if (boxesClone.contains(goal)) {
+                    continue; //There is another box in this goal
+                }
+                int d = Position.manhattanDistance(box, goal);
+                if (d < min) {
+                    min = d;
+                    g = goal;
+                }
+            }
+            goalsClone.remove(g);
+            sum += min;
+        }
+
+        for (Position box : boxes) {
+            if (Main.isGoal(box)) {
+                sum -= 25;
+            }
+        }
+
         return sum;
-    }    
-    
-    public void updateValue(){
-    	this.value = stateHeuristic();
+    }
+
+    public void updateValue() {
+        this.value = stateHeuristic();
     }
 
     /**
      * Returns true if all boxes are standing on a goal, else false
+     *
      * @return True if the game is finished
      */
     public boolean finished() {
@@ -223,9 +253,9 @@ public class State implements Cloneable, Comparable<State> {
         return true;
     }
 
-	@Override
-	public int compareTo(State o) {
-		// TODO Auto-generated method stub
-		return this.value - o.value;
-	}
+    @Override
+    public int compareTo(State o) {
+        // TODO Auto-generated method stub
+        return this.value - o.value;
+    }
 }

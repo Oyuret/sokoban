@@ -114,12 +114,16 @@ public class Main {
 
         fringe.add(first);
         visitedStates.add(first);
+        
+        //int iterations =0;
 
         //BEST-FIRST SEARCH
         while (fringe.size() > 0) {
+            //iterations++;
             long start = new Date().getTime();
             //Pop new state
         	//System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
+            //System.out.println(iterations);
             State state = fringe.poll();
 //        	State state = fringe.pop();
 

@@ -183,7 +183,7 @@ public class Utils {
 
             // the adjacent cell to this box (U D L R)
             Position pos = new Position(row + Main.MOVE_Y[i], col + Main.MOVE_X[i]);
-            
+
             // add it to the list
             adjucent.add(pos);
 
