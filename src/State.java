@@ -9,10 +9,10 @@ import java.util.logging.Logger;
  
 public class State implements Cloneable, Comparable<State> {
  
-    private Position player;
-    private Set<Position> boxes = new HashSet<Position>();
-    private String current_path;
-    private int value;
+    public Position player;
+    public Set<Position> boxes = new HashSet<Position>();
+    public String current_path;
+    public int value;
  
     public State(Position player, Set<Position> boxes, String current_path) {
         this.player = player;
@@ -28,6 +28,22 @@ public class State implements Cloneable, Comparable<State> {
      * @param nextStates
      */
     public void getNextMoves(List<State> nextStates) {
+        
+        boolean found = false;
+        for(Position box : boxes) {
+            for(Position goal : Main.goals) {
+                if(Main.goals.contains(box)) continue;
+                if(Utils.findPath(box, goal, this)!=null) {
+                    State newState = Utils.findBoxPathToGoal(box, goal, this);
+                    if(newState!=null) {
+                        nextStates.add(newState);
+                        found = true;
+                    }
+                }
+            }
+        }
+        
+        if(found) return;
  
         // for each box. Chech which boxes we can reach
         // box : The current box we are looking at

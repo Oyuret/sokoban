@@ -45,9 +45,9 @@ public class Main {
             }
         } // End while
         State first = parseBoard(b);
-        for (int i = 0; i < board.length; i++) {
-              System.out.println(new String(board[i]));
-        }
+//        for (int i = 0; i < board.length; i++) {
+//              System.out.println(new String(board[i]));
+//        }
         String result = solveMap(first);
         System.out.println(result);
     } // main

@@ -6,6 +6,8 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
  
 /**
  * This class holds diverse algorithms used by the program. Statically declared
@@ -24,8 +26,72 @@ public class Utils {
      * @param currentState The current state of the game
      * @return The path the player took in order to move the box. Else null
      */
-    public static Movement findBoxPathToGoal(Position box, Position goal, State currentState) {
-        Position player = currentState.getPlayer();
+    public static State findBoxPathToGoal(Position box, Position goal, State currentState) {
+        HashSet<State> visited = new HashSet<>();
+        PriorityQueue<StateHolder> prio = new PriorityQueue<>();
+        
+        // add the first state to the prio
+        prio.add(new StateHolder(currentState, box));
+        
+        while(!prio.isEmpty()) {
+            StateHolder currentStateHolder = prio.poll();
+            State current = currentStateHolder.getState();
+            Position currentBox = currentStateHolder.getBox();
+            Position player = current.getPlayer();
+            
+            if(current.getBoxes().contains(goal)) {
+                current.updateValue();
+                return current;
+            }
+            
+            for (Position adjucent : getAdjucentPositions(currentBox, current)) {
+                // find out if we can reach it from our current position w/o
+                // moving any boxes
+                String path_to_adjucent = findPath(player, adjucent, current);
+ 
+                // check if there was such path
+                if (path_to_adjucent != null) {
+ 
+                    // try to move the box
+                    Movement moved_path = tryToMoveBox(currentBox, adjucent, current);
+ 
+                    // check if we actually managed to move the box
+                    if (moved_path != null) {
+ 
+                        // create a new state
+                        State new_state;
+                        try {
+                            // clone this state
+                            new_state = (State) current.clone();
+ 
+                            // update the BoxState we just moved
+                            new_state.boxes.remove(currentBox);
+                            new_state.boxes.add(moved_path.getBox());
+ 
+                            // update the player state
+                            new_state.player = moved_path.getPlayer();
+ 
+                            // update the current path
+                            new_state.current_path = new StringBuilder(new_state.current_path).
+                                    append(path_to_adjucent).append(moved_path.getPath()).toString();
+ 
+                            //new_state.updateValue();
+                            new_state.value = Position.manhattanDistance(moved_path.getBox(), goal);
+                            // add this state to the list to return
+                            if(!visited.contains(new_state)) {
+                                visited.add(new_state);
+                                prio.add(new StateHolder(new_state, moved_path.getBox()));
+                            }
+ 
+                        } catch (CloneNotSupportedException ex) {
+                            Logger.getLogger(State.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } // end checking if moved_path is null   
+                } // end checking if path to box is null
+            } // end for each adjucent position to a box
+            
+            
+        }
  
         return null;
     }
