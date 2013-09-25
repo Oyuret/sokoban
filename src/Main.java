@@ -33,21 +33,20 @@ public class Main {
  
         String line;
  
+        /*Parse the board*/
         lengthMax = 0;
         while(!br.ready());
         while (br.ready()) {
             line = br.readLine();
-//            System.out.println(line);
             b.add(line);
- 
-            if (lengthMax < line.length()) {
-                lengthMax = line.length();
-            }
+            lengthMax = Math.max(lengthMax,line.length());
         } // End while
+        
         State first = parseBoard(b);
-        for (int i = 0; i < board.length; i++) {
-              System.out.println(new String(board[i]));
-        }
+        /*Now the board is full of dangerous zones*/
+//        for (int i = 0; i < board.length; i++) {
+//              System.out.println(new String(board[i]));
+//        }
         String result = solveMap(first);
         System.out.println(result);
     } // main
@@ -79,14 +78,14 @@ public class Main {
         fringe.add(first);
         visitedStates.add(first);
         
-        //int iterations =0;
+//        int iterations =0;
  
         //BEST-FIRST SEARCH
         while (fringe.size() > 0) {
-            //iterations++;
+//            iterations++;
             //Pop new state
                 //System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
-            //System.out.println(iterations);
+//            System.out.println(iterations);
             State state = fringe.poll();
 //              State state = fringe.pop();
  

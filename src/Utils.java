@@ -283,5 +283,29 @@ public class Utils {
         }//end while        
         return null;
     }
+    
+    
+    
+    /*--------------------------------------------------------------------------*/
+    public static int getGoalValue(Position goal, State currentState){
+    	if(currentState.getBoxes().contains(goal))
+    		return 0;
+    	int row0 = goal.getRow();
+    	int col0 = goal.getCol();
+    	int val = 0;
+    	for(int i= row0-1;i<row0+1;i++){
+    		for(int j = col0-1;j<col0+1;j++){ /*Analyze neighbours*/
+    			if(!(i == row0 && j == col0)){ //It's not the goal itself
+    				if(Main.board[i][j] == '#' || currentState.getBoxes().contains(new Position(i,j))){
+    					if(i== row0 || j == col0) //it's an edge
+    						val+=40;
+    					else //It's a diagonal
+    						val+=20;
+    				}
+    			}
+    		}
+    	}
+    	return val;
+    }
 }
  

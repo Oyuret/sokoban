@@ -236,7 +236,7 @@ public class State implements Cloneable, Comparable<State> {
  
         for (Position box : boxes) {
             if (Main.isGoal(box)) {
-                sum -= 25;
+                sum -= Utils.getGoalValue(box, this);
             }
         }
  
