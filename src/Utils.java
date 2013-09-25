@@ -1,4 +1,5 @@
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -39,8 +40,8 @@ public class Utils {
     public static String findPath(Position start, Position goal, State currentState) {
 
         // Fields used by the findPath algorithm
-        HashSet<Position> visited = new HashSet<>();
-        PriorityQueue<Step> prio = new PriorityQueue<>();
+        HashSet<Position> visited = new HashSet<Position>();
+        PriorityQueue<Step> prio = new PriorityQueue<Step>();
 
         // add the first position to the queue
         prio.add(new Step(start, Position.manhattanDistance(start, goal), ""));
@@ -137,6 +138,47 @@ public class Utils {
         // if we reached here we just couldn't move the box!
         return null;
     }
+    
+    /**
+     * Tries to move the box in the direction given by player relative to box.
+     * If this is possible it will return a {@link Movement}, else null.
+     *
+     * @param box The positioning of the box
+     * @param player The positioning of the player
+     * @param currentState The current State
+     * @return The Movement which holds the new box position, the new player
+     * position and the path there. Returns null if the box cannot be moved.
+     */
+    public static Movement tryToMoveBoxBack(Position box, Position player, State currentState) {
+
+        // the player's current row and column
+        int row = box.getRow();
+        int column = box.getCol();
+
+        // for each possible direction
+        for (int i = 0; i < Main.MOVES.length; i++) {
+
+            // the position the box would have if he moved (U D L R)
+            Position adjucent = new Position(row + Main.MOVE_Y[i], column + Main.MOVE_X[i]);
+
+            // if this position is where the player is
+            if (adjucent.equals(player)) {
+
+                // Create the position where the box will now be
+                Position new_player_position = new Position(player.getRow() + Main.MOVE_Y[i], player.getCol() + Main.MOVE_X[i]);
+                String path = new StringBuilder().append(Main.MOVES[i]).toString();
+
+                // if the place where we want to place the box is empty
+                if (Main.isEmptyPosition(new_player_position) && !currentState.getBoxes().contains(new_player_position)) {
+                    return new Movement(adjucent, new_player_position, path);
+                }
+            }
+
+        }
+
+        // if we reached here we just couldn't move the box!
+        return null;
+    }
 
     /**
      * Returns a list with all (empty) possible adjacent positions to a box
@@ -152,7 +194,7 @@ public class Utils {
         int col = box.getCol();
 
         // the list to be returned with the valid adjucent positions
-        List<Position> adjucent = new ArrayList<>();
+        List<Position> adjucent = new ArrayList<Position>();
 
         // for each possible adjucent position to the box
         for (int i = 0; i < Main.MOVES.length; i++) {
@@ -169,6 +211,43 @@ public class Utils {
 
         return adjucent;
     }
+    
+    /**
+     * Returns a list with all (empty) possible adjacent positions to a box in backwards
+     * movement. It'll check that two fields are empty
+     *
+     * @param box The position of the box
+     * @param currentState The current State of the game
+     * @return A list with all available (empty) adjacent positions to the box.
+     */
+    public static List<Position> getAdjucentPositionsBack(Position box, State currentState) {
+
+        // the row and column of this box
+        int row = box.getRow();
+        int col = box.getCol();
+
+        // the list to be returned with the valid adjucent positions
+        List<Position> adjucent = new ArrayList<Position>();
+
+        // for each possible adjucent position to the box
+        for (int i = 0; i < Main.MOVES.length; i++) {
+
+            // the adjacent cell to this box (U D L R)
+            Position pos = new Position(row + Main.MOVE_Y[i], col + Main.MOVE_X[i]);
+            // the adjacent cell to this first cell
+            Position pos2 = new Position(row + Main.MOVE_Y[i]*2, col + Main.MOVE_X[i]*2);
+
+            // check if this spot is empty or not
+            if (Main.isEmptyPosition(pos) && !currentState.getBoxes().contains(pos)) {
+            	if (Main.isEmptyPosition(pos2) && !currentState.getBoxes().contains(pos2)) {
+                // add it to the list
+              	 adjucent.add(pos);
+            	}
+            }
+        } // end adding positions
+
+        return adjucent;
+    }
 
     public static List<Position> getAllAdjucentPositions(Position box, State currentState) {
         // the row and column of this box
@@ -176,7 +255,7 @@ public class Utils {
         int col = box.getCol();
 
         // the list to be returned with the valid adjucent positions
-        List<Position> adjucent = new ArrayList<>();
+        List<Position> adjucent = new ArrayList<Position>();
 
         // for each possible adjucent position to the box
         for (int i = 0; i < Main.MOVES.length; i++) {
@@ -190,5 +269,33 @@ public class Utils {
         } // end adding positions
 
         return adjucent;
+    }
+    
+    /**
+     * Translate a String from resolving the game backwards to a one resolving it forwards
+     * @param back
+     * @return
+     */
+    public static String translateBack(String back) {
+    	 StringBuilder builder=new StringBuilder(back); 
+    	 String reverse = builder.reverse().toString();
+    	 String result = "";
+    	 for(int i=0; i<reverse.length();i++) {
+    		 Character a =  reverse.charAt(i);
+    		 if(a==' ') {
+    			 result += ' ';
+    		 } else if(a=='R') {
+    			 result += 'L';
+    		 } else if(a=='U') {
+    			 result += 'D';
+    		 } else if(a=='D') {
+    			 result += 'U';
+    		 } else if(a=='L') {
+    			 result += 'R';
+    		 } else {
+    			 // Should not enter here!
+    		 }
+    	 }
+    	return result;
     }
 }

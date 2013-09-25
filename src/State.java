@@ -1,14 +1,16 @@
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class State implements Cloneable, Comparable<State> {
 
     private Position player;
-    private PriorityQueue<Position> boxes = new PriorityQueue<>();
+    private PriorityQueue<Position> boxes = new PriorityQueue<Position>();
     private String current_path;
     private int value;
 
@@ -75,6 +77,108 @@ public class State implements Cloneable, Comparable<State> {
             } // end for each adjucent position to a box
         } // end for each box
     }
+    
+    /**
+     * Fills up the given list with all possible new states which involve moving
+     * a box backwards
+     *
+     * @param nextStates
+     */
+    public void getNextMovesBack(List<State> nextStates) {
+
+        // for each box. Chech which boxes we can reach
+        // box : The current box we are looking at
+        for (Position box : boxes) {
+            // for each empty position adjucent to this box
+            // adjucent : the current adjucent position to the box
+            for (Position adjucent : Utils.getAdjucentPositionsBack(box, this)) {
+                // find out if we can reach it from our current position w/o
+                // moving any boxes
+                String path_to_adjucent = Utils.findPath(player, adjucent, this);
+
+                // check if there was such path
+                if (path_to_adjucent != null) {
+                	
+                    // try to move the box
+                    Movement moved_path = Utils.tryToMoveBoxBack(box, adjucent, this);
+                    // check if we actually managed to move the box
+                    
+                    if (moved_path != null) {
+                        // create a new state
+                        State new_state;
+                        try {
+                            // clone this state
+                            new_state = (State) this.clone();
+
+                            // update the BoxState we just moved
+                            new_state.boxes.remove(box);
+                            new_state.boxes.add(moved_path.getBox());
+
+                            // update the player state
+                            new_state.player = moved_path.getPlayer();
+
+                            // update the current path
+                            new_state.current_path = new StringBuilder(new_state.current_path).
+                                    append(path_to_adjucent).append(moved_path.getPath()).toString();
+
+                            new_state.updateValue();
+                            // add this state to the list to return
+                            nextStates.add(new_state);
+
+                        } catch (CloneNotSupportedException ex) {
+                            Logger.getLogger(State.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } // end checking if moved_path is null
+                } // end checking if path to box is null
+            } // end for each adjucent position to a box
+        } // end for each box
+    }
+    
+    
+    public void getNextMovesInitialBack(Set<State> nextStates) {
+
+        // for each box. Chech which boxes we can reach
+        // box : The current box we are looking at
+        for (Position box : boxes) {
+            // for each empty position adjucent to this box
+            // adjucent : the current adjucent position to the box
+            for (Position adjucent : Utils.getAdjucentPositionsBack(box, this)) {
+                
+                	
+                    // try to move the box
+                    Movement moved_path = Utils.tryToMoveBoxBack(box, adjucent, this);
+                    // check if we actually managed to move the box
+                    
+                    if (moved_path != null) {
+                        // create a new state
+                        State new_state;
+                        try {
+                            // clone this state
+                            new_state = (State) this.clone();
+
+                            // update the BoxState we just moved
+                            new_state.boxes.remove(box);
+                            new_state.boxes.add(moved_path.getBox());
+
+                            // update the player state
+                            new_state.player = moved_path.getPlayer();
+
+                            // update the current path
+                            new_state.current_path = new StringBuilder(new_state.current_path)
+                            .append(moved_path.getPath()).toString();
+
+                            new_state.updateValue();
+                            // add this state to the list to return
+                            nextStates.add(new_state);
+
+                        } catch (CloneNotSupportedException ex) {
+                            Logger.getLogger(State.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } // end checking if moved_path is null
+               
+            } // end for each adjucent position to a box
+        } // end for each box
+    }
 
     /**
      * Calculates the hashcode of this state. Based only on the positioning of
@@ -130,7 +234,7 @@ public class State implements Cloneable, Comparable<State> {
         State result = (State) super.clone();
         result.player = new Position(player.getRow(), player.getCol());
         result.current_path = new String(current_path);
-        result.boxes = new PriorityQueue<>();
+        result.boxes = new PriorityQueue<Position>();
         for (Position pos : boxes) {
             result.boxes.add(new Position(pos.getRow(), pos.getCol()));
         }

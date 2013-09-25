@@ -1,6 +1,6 @@
 
 
-import java.util.Objects;
+
 
 /*
  * To change this template, choose Tools | Templates
@@ -61,7 +61,7 @@ public class Movement {
             return false;
         }
         final Movement other = (Movement) obj;
-        if (!Objects.equals(this.box, other.box)) {
+        if (!(this.box.equals(other.box)&& other.box.equals(this.box))) {
             return false;
         }
         if (!this.player.equals(other.player)) {

@@ -1,4 +1,5 @@
 
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,8 @@ public class Main {
     static char[][] board; //Easier access instead of string
     private static int lengthMax; // max number of columns
     static Set<Position> goals;
+    
+    private static final int MILISEC_F = 100;
 
     public static void main(String[] args) throws IOException {
         Vector<String> b = new Vector<String>();
@@ -35,26 +38,17 @@ public class Main {
         String line;
 
         lengthMax = 0;
-        //while(!br.ready());
+        while(!br.ready());
         while (br.ready()) {
             line = br.readLine();
-//            System.out.println(line);
             b.add(line);
 
             if (lengthMax < line.length()) {
                 lengthMax = line.length();
             }
         } // End while
-        long s = new Date().getTime();
         State first = parseBoard(b);
-        long e = new Date().getTime();
-        //System.out.println("Time parse board: " + (e - s) + " ms");
-        for (int i = 0; i < board.length; i++) {
-//        	System.out.println(new String(board[i]));
-        }
         String result = solveMap(first);
-        long f = new Date().getTime();
-        //System.out.println("Total time: " + (f-s));
         System.out.println(result);
     } // main
 
@@ -109,23 +103,16 @@ public class Main {
     public static String solveMap(State first) {
         // Initialization
         PriorityQueue<State> fringe = new PriorityQueue<State>();
-//    	Stack<State> fringe = new Stack<State>();
-        Set<State> visitedStates = new HashSet<>(10000);
+        Set<State> visitedStates = new HashSet<State>(10000);
 
         fringe.add(first);
         visitedStates.add(first);
         
-        //int iterations =0;
-
+        long start = new Date().getTime();
         //BEST-FIRST SEARCH
-        while (fringe.size() > 0) {
-            //iterations++;
-            long start = new Date().getTime();
-            //Pop new state
-        	//System.out.println("FRINGE: "+fringe.size() + " ; VISITED: "+visitedStates.size());
-            //System.out.println(iterations);
+        while (fringe.size() > 0 && (new Date().getTime() - start) < MILISEC_F) {
+        	
             State state = fringe.poll();
-//        	State state = fringe.pop();
 
             if (state.finished()) {
                 return state.getCurrent_path();
@@ -142,10 +129,74 @@ public class Main {
                     visitedStates.add(next);
                 }
             }
-            long end = new Date().getTime();
-//            System.out.println("ITERATION TIMAR: "+(end-start)+" ms");
 
-        }//end while        
+        }//end while 
+        
+        
+        
+        // We start here moving BACKWARDS!
+        fringe = new PriorityQueue<State>();
+        Set<State> visitedStatesB = new HashSet<State>(100000);
+        // We change goals and boxPositions in 1st state
+        PriorityQueue<Position> goalBox = new PriorityQueue<Position>(); // boxes start in goal
+        goalBox.addAll(goals);
+        State state0 = new State(new Position(1,1), goalBox, "");
+        Main.goals = new HashSet<Position>();
+        Main.goals.addAll(first.getBoxes());
+        
+        state0.getNextMovesInitialBack(visitedStatesB);
+        fringe.addAll(visitedStatesB);
+        
+        // Check if we reach a solution with the first states
+        for(State firsts: visitedStatesB) {
+        	if(visitedStates.contains(firsts)) { // FINISHED!! we have found a result!
+       		 String path1 = null;
+       		 // We take the first path, better implementations?
+       		 for(State st1 : visitedStates) {
+       			 if(st1.equals(firsts)) {
+       				 path1 = st1.getCurrent_path();
+       				 String path_for_player = Utils.findPath(st1.getPlayer(), firsts.getPlayer(), st1);
+       				 path1 += path_for_player;
+       				 break;
+       			 }
+       		 }
+       		 
+//       		 if(path1 == null) throw new Exception("problem at finishing backwards"); // Should not give exception
+       		 return path1 + Utils.translateBack(firsts.getCurrent_path());
+       	 }
+        }
+        
+        while (fringe.size() > 0) {
+        	 State state = fringe.poll();
+        	 
+        	 
+        	 //Expand the state
+             List<State> nextStates = new ArrayList<State>();
+             state.getNextMovesBack(nextStates); //This takes ~1 ms on map 1, ~4ms on map 100.
+             for (State next : nextStates) {
+            	 
+            	 if(visitedStates.contains(next)) { // FINISHED!! we have found a result!
+            		 String path1 = null;
+            		 // We take the first path, better implementations?
+            		 for(State st1 : visitedStates) {
+            			 if(st1.equals(next)) {
+            				 path1 = st1.getCurrent_path();
+            				 String path_for_player = Utils.findPath(st1.getPlayer(), next.getPlayer(), st1);
+               				 path1 += path_for_player;
+            				 break;
+            			 }
+            		 }
+            		 
+//            		 if(path1 == null) throw new Exception("problem at finishing backwards"); // Should not give exception
+            		 return path1 + Utils.translateBack(next.getCurrent_path());
+            	 }
+            	 
+                 if (!visitedStatesB.contains(next)) { // We'll have to create some rules in backwards
+                     fringe.add(next);
+                     visitedStatesB.add(next);
+                 }
+             }
+        }//end while
         return null;
     }
 
@@ -308,7 +359,7 @@ public class Main {
         }
         
         // store all relevant positions to the box
-        ArrayList<Position> positions = new ArrayList<>();
+        ArrayList<Position> positions = new ArrayList<Position>();
         
         for(int i=box.getRow()-1, x=1; i<=box.getRow()+1; i++, x++) {
             for(int j= box.getCol()-1, y=1; j<=box.getCol()+1; j++, y++) {
