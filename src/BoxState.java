@@ -1,67 +1,67 @@
 
-
-
 import java.util.ArrayList;
 import java.util.List;
-
-public class BoxState implements Comparable<BoxState> {
-
+ 
+public class BoxState implements Comparable<BoxState>, GenericState {
+ 
     private Position position;
     private String path;
     private int goalDistance;
     private Position goal;
-
+ 
     public BoxState(Position position, String path, Position goal) {
         this.position = position;
         this.path = path;
         this.goal = goal;
         this.goalDistance = Position.manhattanDistance(position, goal); //Manhattan distance to the goal
     }
-
+ 
     public Position getPosition() {
         return position;
     }
-
+ 
     public void setPosition(Position position) {
         this.position = position;
     }
-
+ 
     public String getPath() {
-        return path;
+        return this.path;
     }
-
+ 
     public void setPath(String path) {
         this.path = path;
     }
-
+ 
     public int getGoalDistance() {
         return goalDistance;
     }
-
+ 
     public void setGoalDistance(int goalDistance) {
         this.goalDistance = goalDistance;
     }
-
+ 
     /**
      * Returns a list of all possible movements for a box given its current
      * position
      *
      * @return
      */
-    public List<BoxState> getNextBoxStates() {
+    @Override
+    public List<GenericState> getNextStates() {
         int row = this.position.getRow();
         int col = this.position.getCol();
-        List<BoxState> nextStates = new ArrayList<BoxState>();
+        List<GenericState> nextStates = new ArrayList<GenericState>();
         for (int i = 0; i < Main.MOVES.length; i++) {
             Position newPos = new Position(row + Main.MOVE_Y[i], col + Main.MOVE_X[i]);
             Position newPosOpposite = new Position(row - Main.MOVE_Y[i], col - Main.MOVE_X[i]);
-            if (Main.isValidPosition(newPos) && Main.isValidPosition(newPosOpposite) && Main.isSafePosition(newPos) && Main.isEmptyPosition(newPosOpposite)) {
+            if (Main.isValidPosition(newPos) && Main.isValidPosition(newPosOpposite) && Main.isEmptyPosition(newPos) && Main.isEmptyPosition(newPosOpposite)
+                        &&Main.isSafePosition(newPos) ) {
                 nextStates.add(new BoxState(newPos, new StringBuilder(path).append(Main.MOVES[i]).toString(), this.goal));
             }
         }
         return nextStates;
     }
-
+ 
     /**
      * Implement the Comparable Interface. This way the states will be
      * automatically ordered in the PriorityQueue in such a way that the first
@@ -72,7 +72,7 @@ public class BoxState implements Comparable<BoxState> {
     public int compareTo(BoxState o) {
         return this.goalDistance - o.goalDistance;
     }
-
+ 
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -82,7 +82,7 @@ public class BoxState implements Comparable<BoxState> {
                 + ((position == null) ? 0 : position.hashCode());
         return result;
     }
-
+ 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -111,4 +111,9 @@ public class BoxState implements Comparable<BoxState> {
         }
         return true;
     }
+ 
+        @Override
+        public boolean isGoal(Position goal) {
+                return this.position.equals(goal);
+        }
 }
