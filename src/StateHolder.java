@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
@@ -36,7 +32,5 @@ public class StateHolder implements Comparable<StateHolder>{
     public int compareTo(StateHolder o) {
         return this.state.value - o.state.value;
     }
-    
-    
-    
+   
 }
