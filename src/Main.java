@@ -76,7 +76,7 @@ public class Main {
         // Initialization
         PriorityQueue<State> fringe = new PriorityQueue<State>();
 
-        Set<State> visitedStates = new HashSet<State>(10000);
+        Set<State> visitedStates = new HashSet<State>(100000);
 
         fringe.add(first);
         visitedStates.add(first);
