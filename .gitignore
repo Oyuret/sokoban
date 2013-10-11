@@ -16,3 +16,12 @@ build.xml
 .project
 /build/
 /bin
+
+#texworks
+.aux
+.log
+.pdf
+.gz
+
+
+
