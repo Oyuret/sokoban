@@ -12,16 +12,16 @@ manifest.mf
 build.xml
 
 #eclipse specific
-.classpath
-.project
+*.classpath
+*.project
 /build/
 /bin
 
 #texworks
-.aux
-.log
-.pdf
-.gz
+*.aux
+*.log
+*.pdf
+*.gz
 
 
 
