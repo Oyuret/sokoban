@@ -1,4 +1,3 @@
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,11 +23,11 @@ public class Main {
     static char[][] board; //Easier access instead of string
     private static int lengthMax; // max number of columns
     static Set<Position> goals;
-
+ 
     
-    private static final int MILISEC_F = 100;
-
-
+    private static final int MILISEC_F = 5500;
+ 
+ 
     public static void main(String[] args) throws IOException {
         Vector<String> b = new Vector<String>();
         goals = new HashSet<Position>();
@@ -49,7 +48,7 @@ public class Main {
             }
         } // End while
         State first = parseBoard(b);
-
+ 
         String result = solveMap(first);
         System.out.println(result);
     } // main
@@ -75,19 +74,19 @@ public class Main {
     public static String solveMap(State first) {
         // Initialization
         PriorityQueue<State> fringe = new PriorityQueue<State>();
-
+ 
         Set<State> visitedStates = new HashSet<State>(100000);
-
+ 
         fringe.add(first);
         visitedStates.add(first);
         
         long start = new Date().getTime();
         //BEST-FIRST SEARCH
         while (fringe.size() > 0 && (new Date().getTime() - start) < MILISEC_F) {
-        	
+                
             State state = fringe.poll();
-
-
+ 
+ 
             if (state.finished()) {
                 return state.getCurrent_path();
             }
@@ -103,7 +102,7 @@ public class Main {
                     visitedStates.add(next);
                 }
             }
-
+ 
         }//end while 
         
         
@@ -123,55 +122,55 @@ public class Main {
         
         // Check if we reach a solution with the first states
         for(State firsts: visitedStatesB) {
-        	if(visitedStates.contains(firsts)) { // FINISHED!! we have found a result!
-       		 String path1 = null;
-       		 // We take the first path, better implementations?
-       		 for(State st1 : visitedStates) {
-       			 if(st1.equals(firsts)) {
-       				 path1 = st1.getCurrent_path();
-       				 String path_for_player = Utils.findPath(st1.getPlayer(), firsts.getPlayer(), st1);
-       				 path1 += path_for_player;
-       				 break;
-       			 }
-       		 }
-       		 
-//       		 if(path1 == null) throw new Exception("problem at finishing backwards"); // Should not give exception
-       		 return path1 + Utils.translateBack(firsts.getCurrent_path());
-       	 }
+                if(visitedStates.contains(firsts)) { // FINISHED!! we have found a result!
+                 String path1 = null;
+                 // We take the first path, better implementations?
+                 for(State st1 : visitedStates) {
+                         if(st1.equals(firsts)) {
+                                 path1 = st1.getCurrent_path();
+                                 String path_for_player = Utils.findPath(st1.getPlayer(), firsts.getPlayer(), st1);
+                                 path1 += path_for_player;
+                                 break;
+                         }
+                 }
+                 
+//                       if(path1 == null) throw new Exception("problem at finishing backwards"); // Should not give exception
+                 return path1 + Utils.translateBack(firsts.getCurrent_path());
+         }
         }
         
         while (fringe.size() > 0) {
-        	 State state = fringe.poll();
-        	 
-        	 
-        	 //Expand the state
+                 State state = fringe.poll();
+                 
+                 
+                 //Expand the state
              List<State> nextStates = new ArrayList<State>();
              state.getNextMovesBack(nextStates); //This takes ~1 ms on map 1, ~4ms on map 100.
              for (State next : nextStates) {
-            	 
-            	 if(visitedStates.contains(next)) { // FINISHED!! we have found a result!
-            		 String path1 = null;
-            		 // We take the first path, better implementations?
-            		 for(State st1 : visitedStates) {
-            			 if(st1.equals(next)) {
-            				 path1 = st1.getCurrent_path();
-            				 String path_for_player = Utils.findPath(st1.getPlayer(), next.getPlayer(), st1);
-               				 path1 += path_for_player;
-            				 break;
-            			 }
-            		 }
-            		 
-//            		 if(path1 == null) throw new Exception("problem at finishing backwards"); // Should not give exception
-            		 return path1 + Utils.translateBack(next.getCurrent_path());
-            	 }
-            	 
+                 
+                 if(visitedStates.contains(next)) { // FINISHED!! we have found a result!
+                         String path1 = null;
+                         // We take the first path, better implementations?
+                         for(State st1 : visitedStates) {
+                                 if(st1.equals(next)) {
+                                         path1 = st1.getCurrent_path();
+                                         String path_for_player = Utils.findPath(st1.getPlayer(), next.getPlayer(), st1);
+                                         path1 += path_for_player;
+                                         break;
+                                 }
+                         }
+                         
+//                       if(path1 == null) throw new Exception("problem at finishing backwards"); // Should not give exception
+                         return path1 + Utils.translateBack(next.getCurrent_path());
+                 }
+                 
                  if (!visitedStatesB.contains(next)) { // We'll have to create some rules in backwards
                      fringe.add(next);
                      visitedStatesB.add(next);
                  }
              }
         }//end while    
-
+ 
         return null;
     }
  
@@ -289,10 +288,10 @@ public class Main {
         return board[p.getRow()][p.getCol()] != 'x' || isGoal(p);
     }
  
-    public static boolean isBoxPosition(Position p) {
-        char c = board[p.getRow()][p.getCol()];
-        return c == '$' || c == '*';
-    }
+//    public static boolean isBoxPosition(Position p) {
+//        char c = board[p.getRow()][p.getCol()];
+//        return c == '$' || c == '*';
+//    }
  
     public static boolean isValidPosition(Position p) {
         int row = p.getRow();
@@ -391,5 +390,46 @@ public class Main {
     public static boolean isGoal(Position p) {
         return goals.contains(p);
     }
-} // End Main
+    
+    
+    /*--------------------------------------*/
+    /**
+     * Returns an integer representing the total number of reachable positions from the player
+     * @param player
+     * @return
+     */
+    public static int floodFill(State s){
+        // Initialization
+        Queue<Position> fringe = new LinkedList<Position>();
+        Set<Position> visitedStates = new HashSet<Position>();
  
+        fringe.add(s.player);
+        visitedStates.add(s.player);
+ 
+        while (fringe.size() > 0) {
+            //Pop new state
+            Position state = fringe.poll();
+            //Expand the state
+            List<Position> nextStates = new ArrayList<Position>();
+            for(int i=0;i<4;i++){
+                Position newP = new Position(state.getRow()+MOVE_Y[i], state.getCol()+MOVE_X[i]);
+                if(isValidPosition(newP) && isEmptyPosition(newP) && !s.boxes.contains(newP))
+                        nextStates.add(newP);
+            }
+            for (Position p : nextStates) {
+                if (!visitedStates.contains(p)) //Add next States to the fringe if they are not visited
+                {
+                    fringe.add(p);
+                    visitedStates.add(p);
+                }
+            }            
+        }//end while        
+        
+        /*Now we have all the reachable positions on the visitedStates list*/
+        int result=0;
+        for(Position p : visitedStates){
+                result += 3*p.getRow() + 7*p.getCol();
+        }
+        return result;
+    }
+} // End Main
