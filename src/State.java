@@ -1,7 +1,6 @@
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,7 +47,7 @@ public class State implements Cloneable, Comparable<State> {
             }
         }
         
-        if(found) return;
+       // if(found) return;
  
         // for each box. Chech which boxes we can reach
         // box : The current box we are looking at
@@ -324,9 +323,11 @@ public class State implements Cloneable, Comparable<State> {
      * @return
      */
     public int stateHeuristic() {
+        if(Main.walkingDistance == null) return 0;
+        
         int sum = 0;
-        List<Position> boxesClone = new ArrayList<Position>();
-        List<Position> goalsClone = new ArrayList<Position>();
+        List<Position> boxesClone = new LinkedList<Position>();
+        List<Position> goalsClone = new LinkedList<Position>();
         boxesClone.addAll(boxes);
         goalsClone.addAll(Main.goals);
 //      for(Position goal : Main.goals) {
@@ -359,7 +360,8 @@ public class State implements Cloneable, Comparable<State> {
                 if (boxesClone.contains(goal)) {
                     continue; //There is another box in this goal
                 }
-                int d = Position.manhattanDistance(box, goal);
+//                int d = Position.manhattanDistance(box, goal);
+                int d = Main.walkingDistance.get(new PositionPair(box,goal));
                 if (d < min) {
                     min = d;
                     g = goal;
@@ -372,6 +374,7 @@ public class State implements Cloneable, Comparable<State> {
         for (Position box : boxes) {
             if (Main.isGoal(box)) {
                 sum -= 25;
+                //sum -= Utils.getGoalValue(box, this);
             }
         }
  
