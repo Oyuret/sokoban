@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.text.PlainDocument;
  
 /**
  * This class holds diverse algorithms used by the program. Statically declared
@@ -212,7 +211,7 @@ public class Utils {
  
         // the list to be returned with the valid adjucent positions
  
-        List<Position> adjucent = new ArrayList<Position>();
+        List<Position> adjucent = new ArrayList<>();
  
         // for each possible adjucent position to the box
         for (int i = 0; i < Main.MOVES.length; i++) {
@@ -246,7 +245,7 @@ public class Utils {
         int col = box.getCol();
  
         // the list to be returned with the valid adjucent positions
-        List<Position> adjucent = new ArrayList<Position>();
+        List<Position> adjucent = new ArrayList<>();
  
         // for each possible adjucent position to the box
         for (int i = 0; i < Main.MOVES.length; i++) {
@@ -275,7 +274,7 @@ public class Utils {
         int col = box.getCol();
  
         // the list to be returned with the valid adjucent positions
-        List<Position> adjucent = new ArrayList<Position>();
+        List<Position> adjucent = new ArrayList<>();
  
         // for each possible adjucent position to the box
         for (int i = 0; i < Main.MOVES.length; i++) {
@@ -323,8 +322,8 @@ public class Utils {
     /*---------------------------SEARCH FUNCTIONS--------------------*/
     public static String depthFirstSearch(GenericState start, Position goal) {
         // Initialization
-        Stack<GenericState> fringe = new Stack<GenericState>();
-        Set<GenericState> visitedStates = new HashSet<GenericState>();
+        Stack<GenericState> fringe = new Stack<>();
+        Set<GenericState> visitedStates = new HashSet<>();
  
         fringe.push(start);
         visitedStates.add(start);
@@ -352,8 +351,8 @@ public class Utils {
     
     public static String breadthFirstSearch(GenericState start, Position goal) {
         // Initialization
-        Queue<GenericState> fringe = new LinkedList<GenericState>();
-        Set<GenericState> visitedStates = new HashSet<GenericState>();
+        Queue<GenericState> fringe = new LinkedList<>();
+        Set<GenericState> visitedStates = new HashSet<>();
  
         fringe.add(start);
         visitedStates.add(start);
@@ -381,8 +380,8 @@ public class Utils {
     
     public static String bestFirstSearch(GenericState start, Position goal) {
         // Initialization
-        PriorityQueue<GenericState> fringe = new PriorityQueue<GenericState>();
-        Set<GenericState> visitedStates = new HashSet<GenericState>();
+        PriorityQueue<GenericState> fringe = new PriorityQueue<>();
+        Set<GenericState> visitedStates = new HashSet<>();
  
         fringe.add(start);
         visitedStates.add(start);

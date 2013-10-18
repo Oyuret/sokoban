@@ -1,17 +1,14 @@
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +25,7 @@ public class Main {
     private static int lengthMax; // max number of columns
     static Set<Position> goals;
     static HashMap<PositionPair, Integer> walkingDistance;
-    private static final int MILISEC_F = 1000;
+    private static final int MILISEC_F = 5500;
 
     public static void main(String[] args) throws IOException {
         Vector<String> b = new Vector<String>();
@@ -76,9 +73,9 @@ public class Main {
      */
     public static String solveMap(State first) {
         // Initialization
-        PriorityQueue<State> fringe = new PriorityQueue<State>();
+        PriorityQueue<State> fringe = new PriorityQueue<>(100000);
 
-        Set<State> visitedStates = new HashSet<State>(100000);
+        Set<State> visitedStates = new HashSet<>(100000);
 
         fringe.add(first);
         visitedStates.add(first);
@@ -263,23 +260,6 @@ public class Main {
         return new State(player, boxes, "");
     }
 
-    /**
-     * Checks if a box on a position pos[] (pos[0] and pos[1]) can be moved.
-     *
-     * @param pos
-     * @return true if there is any way to move that box
-     */
-    public static boolean isIllegal(State currentState) {
-        return false;
-//      for(Position box : currentState.getBoxes()){
-//              for(Position p : Utils.getAllAdjucentPositions(box, currentState)){
-//                      if(!Main.isEmptyPosition(p))
-//                              return true;
-//              }    
-//      }
-//        return false;
-    }
-
     /*---------------------HELPER FUNCTIONS------------------*/
     public static boolean isEmptyPosition(Position p) {
         return board[p.getRow()][p.getCol()] != '#';
@@ -403,8 +383,8 @@ public class Main {
      */
     public static int floodFill(State s) {
         // Initialization
-        Queue<Position> fringe = new LinkedList<Position>();
-        Set<Position> visitedStates = new HashSet<Position>();
+        Queue<Position> fringe = new LinkedList<>();
+        Set<Position> visitedStates = new HashSet<>();
 
         fringe.add(s.player);
         visitedStates.add(s.player);
@@ -413,7 +393,7 @@ public class Main {
             //Pop new state
             Position state = fringe.poll();
             //Expand the state
-            List<Position> nextStates = new ArrayList<Position>();
+            List<Position> nextStates = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
                 Position newP = new Position(state.getRow() + MOVE_Y[i], state.getCol() + MOVE_X[i]);
                 if (isValidPosition(newP) && isEmptyPosition(newP) && !s.boxes.contains(newP)) {
