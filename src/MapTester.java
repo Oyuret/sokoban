@@ -50,16 +50,25 @@ public class MapTester {
     
     private static int pR = -1, pC = -1;
     private static String myUrlToMapsInDropbox = "D:/Dropbox/DD2380-2013/Code/100maps/test";
-    private static int startMap = 0;
-    private static int finalMap = 99;
-    private static boolean showSteps = false;
-    public static int timeLimit = 11; //11 seconds
+    private static int startMap = 71;
+    private static int finalMap = 78;
+    private static int timeLimit = 11; //11 seconds
+    private static int[] unsolvedMapsDueToTimeLimit = new int[finalMap-startMap +1];
+    private static int[] mapsWithWrongAnswer = new int[finalMap-startMap +1];
+    private static int[] solvedMaps = new int[finalMap-startMap +1];
+    
+    private static boolean printProgramOutput = false;  // If this is true, you'll get the program respons printed after solution is tested
+    private static boolean printProgramOutputWhenWrongAnswer = false; //this is to see if the wrong answer is wrong or has an errorMessage
+    private static boolean showSteps = false;           // Mark this as true if you want to see every step on the map the solution will provide
+    private static boolean printIfSolved = false;         // If true, map will show if solved or not, if false, only time spent will be showed.
     
     private static char[][] getMap(int mapNumber) throws FileNotFoundException, IOException{
         
-        String mapNumberTransformation = "00" + Integer.toString(mapNumber);
-        mapNumberTransformation = mapNumberTransformation.substring(mapNumberTransformation.length()-3);
-
+        /* this makes sure the numberformat is correct with numberlength changes*/
+          String mapNumberTransformation = "00" + Integer.toString(mapNumber);
+          mapNumberTransformation = mapNumberTransformation.substring(mapNumberTransformation.length()-3);
+        /*  */
+        
         //Find the parsed map according to a given number
         BufferedReader br = new BufferedReader(new FileReader( myUrlToMapsInDropbox + mapNumberTransformation + ".in"));
         
@@ -266,10 +275,10 @@ public class MapTester {
     
     public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException{
 
-        int solvedMaps = 0,
-            mapsWrongAnswer = 0,
-            mapsOutOfTime = 0,
-            mapsTried = 0;
+        int nSolvedMaps = 0,
+            nMapsWrongAnswer = 0,
+            nMapsOutOfTime = 0,
+            nMapsTried = 0;
         
         long totalTime = 0;
         
@@ -290,10 +299,11 @@ public class MapTester {
             PrintStream newOut = new PrintStream(baos);
             System.setOut(newOut);
 
-            mapsTried++;
+            nMapsTried++;
             long startTime = System.nanoTime(); //Also a timer is needed for the application measurement.
             long timeUsed = 0;
   
+            Main.walkingDistance = null;
             
  //           Main.main(null);            
     /*                
@@ -301,6 +311,7 @@ public class MapTester {
      *      With the timelimit you wont get to see any error messages, like nullpointerexception
      * 
      */
+            boolean timeout = false;
             //running Main with a timelimit includer
             ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<String> future = executor.submit(new Task());
@@ -308,6 +319,7 @@ public class MapTester {
                String a = future.get(MapTester.timeLimit, TimeUnit.SECONDS);
             } catch (ExecutionException ex) {
             } catch (TimeoutException ex) {
+                timeout = true;
             } catch (InterruptedException ex) {
             }
             executor.shutdownNow();
@@ -326,25 +338,50 @@ public class MapTester {
             while(bais.available()>2 ){
                 sb.append((char)bais.read());
             }
+              
+            if(!printIfSolved){
+                if(timeout){
+                    System.out.println(12.0);
+                }
+                else{
+                    System.out.println(timeUsed/1000000000.0);
+                }
+            }
             
-            //Print result (without steps)
+            //Print if map is solved
             if(MapTester.testSolution(mapNr, sb.toString(), showSteps)){
-              System.out.println("Map " + mapNr + " solved in " + (timeUsed/(double)1000000000) + " seconds." );
-              solvedMaps++;
+              
+              if(printIfSolved){
+                System.out.println("Map " + mapNr + " solved in " + (timeUsed/(double)1000000000) + " seconds." );
+              }
+              solvedMaps[nSolvedMaps++] = mapNr;
               totalTime += timeUsed;
             }
             else{
-                if(timeUsed > ((long)MapTester.timeLimit *1000000000)){
-                    System.out.println("Map " + mapNr + " was not solved withing timelimit.");
-                    mapsOutOfTime++;
+                if(timeout){
+                    if(printIfSolved){
+                        System.err.println("Map " + mapNr + " was not solved withing timelimit.");
+                    }
+                    unsolvedMapsDueToTimeLimit[nMapsOutOfTime++] = mapNr;
                     totalTime += timeLimit*1000000000;
                 }
                 else{
-                    System.out.println("Map " + mapNr + " gave wrong answer after " + (timeUsed/(double)1000000000) + " seconds.");
-                    mapsWrongAnswer++;
+                    if(printIfSolved){              
+                        System.err.println("Map " + mapNr + " gave wrong answer after " + (timeUsed/(double)1000000000) + " seconds.");
+                    }
+                    mapsWithWrongAnswer[nMapsWrongAnswer++] = mapNr;
                     totalTime += timeUsed;
+                    
+                    if(!printProgramOutput && (printProgramOutputWhenWrongAnswer)){
+                        System.out.println("Answer given: " + sb.toString() + "\n");
+                    }
                 }
             }
+            
+            if(printProgramOutput){
+                System.out.println("Answer given: " + sb.toString() + "\n");
+            }
+            
             inwriter.close();
             input.close();
             newOut.close();
@@ -352,35 +389,15 @@ public class MapTester {
             bais.close();
         }
         
-        System.out.println("*************************");
-        System.out.println("Maps solved: " +solvedMaps);
-        System.out.println("Maps with wrong answer: " +mapsWrongAnswer);
-        System.out.println("Maps out of time: " + mapsOutOfTime);
+        System.out.println("\n\n*************************");
+        System.out.print("Maps solved: " +nSolvedMaps + "\t\t\t{"); for(int i = 0; i < nSolvedMaps; i++){System.out.print(solvedMaps[i] + ", ");}System.out.println("}");
+        System.out.print("Maps with wrong answer: " +nMapsWrongAnswer + "\t{");for(int i = 0; i < nMapsWrongAnswer; i++){System.out.print(mapsWithWrongAnswer[i] + ", ");}System.out.println("}");
+        System.out.print("Maps out of time: " + nMapsOutOfTime + "\t\t{"); for(int i = 0; i < nMapsOutOfTime; i++){System.out.print(unsolvedMapsDueToTimeLimit[i]+ ", ");}System.out.println("}");
         System.out.println("-------------------------");
-        System.out.println("Maps in total: " + mapsTried);
-        System.out.println("Mean time per map: " + ((totalTime/1000000000.0)/mapsTried) + " seconds." );
+        System.out.println("Maps in total: " + nMapsTried);
+        System.out.println("Mean time per map: " + ((totalTime/1000000000.0)/nMapsTried) + " seconds." );
         System.out.println("*************************");
         System.out.flush();
-    }
-}
-
-class MainThread extends Thread {
-    public MainThread(int number){
-    	super("MainThread" + number);
-    }
-    public void run() {
-
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            Future<String> future = executor.submit(new Task());
-            try {
-               String a = future.get(MapTester.timeLimit, TimeUnit.SECONDS);
-            } catch (ExecutionException ex) {
-            } catch (TimeoutException ex) {
-            } catch (InterruptedException ex) {
-            Logger.getLogger(MainThread.class.getName()).log(Level.SEVERE, null, ex);
-        }
-            executor.shutdownNow();
-    
     }
 }
 
