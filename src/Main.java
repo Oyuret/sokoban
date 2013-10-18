@@ -108,7 +108,7 @@ public class Main {
 
 
         // We start here moving BACKWARDS!
-        fringe = new PriorityQueue<State>();
+        fringe = new PriorityQueue<State>(100000);
         Set<State> visitedStatesB = new HashSet<State>(100000);
         // We change goals and boxPositions in 1st state
         HashSet<Position> goalBox = new HashSet<Position>(); // boxes start in goal
@@ -160,7 +160,6 @@ public class Main {
                         }
                     }
 
-//                       if(path1 == null) throw new Exception("problem at finishing backwards"); // Should not give exception
                     return path1 + Utils.translateBack(next.getCurrent_path());
                 }
 
@@ -185,7 +184,7 @@ public class Main {
         Main.board = new char[board.size()][lengthMax];
 
         Position player = null;
-        Set<Position> boxes = new HashSet<Position>();
+        Set<Position> boxes = new HashSet<>();
 
         // Normal map, exactly the same than in Vector<String> board
         for (int row = 0; row < board.size(); row++) {
@@ -236,11 +235,7 @@ public class Main {
             for (int col = 1; col < lengthMax - 1; col++) {
                 // Case space
                 if (Main.board[row][col] == (' ')) {
-//                    // If theres one wall up or down and another wall right or left => it's a corner!
-//                    if ((Main.board[row - 1][col] == ('#') || (Main.board[row + 1][col] == ('#')))
-//                            && (Main.board[row][col - 1] == ('#') || (Main.board[row][col + 1] == ('#')))) {
-//                        Main.board[row][col] = ('c');
-//                    }
+                    
                     boolean isPath = false;
                     for (Position g : goals) {
                         String path = Utils.bestFirstSearch(new BoxState(new Position(row, col), "", g), g);
@@ -271,10 +266,7 @@ public class Main {
         return board[p.getRow()][p.getCol()] != 'x' || isGoal(p);
     }
 
-//    public static boolean isBoxPosition(Position p) {
-//        char c = board[p.getRow()][p.getCol()];
-//        return c == '$' || c == '*';
-//    }
+    
     public static boolean isValidPosition(Position p) {
         int row = p.getRow();
         int col = p.getCol();
@@ -316,7 +308,7 @@ public class Main {
         }
 
         // store all relevant positions to the box
-        ArrayList<Position> positions = new ArrayList<Position>();
+        ArrayList<Position> positions = new ArrayList<>();
 
         for (int i = box.getRow() - 1, x = 1; i <= box.getRow() + 1; i++, x++) {
             for (int j = box.getCol() - 1, y = 1; j <= box.getCol() + 1; j++, y++) {
@@ -341,10 +333,14 @@ public class Main {
             for (int j = 0; j < 5; j++) {
                 if (tmpBoard[i][j] == '$') {
                     boolean thisOk = false;
-                    if ((tmpBoard[i - 1][j] != '#' && tmpBoard[i - 1][j] != '$') && (tmpBoard[i + 1][j] != '#' && tmpBoard[i + 1][j] != '$')) {
+                    if ((tmpBoard[i - 1][j] != '#' && tmpBoard[i - 1][j] != '$') 
+                            && (tmpBoard[i + 1][j] != '#' 
+                            && tmpBoard[i + 1][j] != '$')) {
                         thisOk = true;
                     }
-                    if ((tmpBoard[i][j - 1] != '#' && tmpBoard[i][j - 1] != '$') && (tmpBoard[i][j + 1] != '#' && tmpBoard[i][j + 1] != '$')) {
+                    if ((tmpBoard[i][j - 1] != '#' && tmpBoard[i][j - 1] != '$') 
+                            && (tmpBoard[i][j + 1] != '#' 
+                            && tmpBoard[i][j + 1] != '$')) {
                         thisOk = true;
                     }
                     if (thisOk) {
@@ -425,8 +421,8 @@ public class Main {
 
 
             // Initialization
-            Queue<Position> fringe = new LinkedList<Position>();
-            Set<Position> visitedStates = new HashSet<Position>();
+            Queue<Position> fringe = new LinkedList<>();
+            Set<Position> visitedStates = new HashSet<>();
 
             fringe.add(copy.player);
             visitedStates.add(copy.player);
@@ -435,7 +431,7 @@ public class Main {
                 //Pop new state
                 Position state = fringe.poll();
                 //Expand the state
-                List<Position> nextStates = new ArrayList<Position>();
+                List<Position> nextStates = new ArrayList<>();
                 for (int i = 0; i < 4; i++) {
                     Position newP = new Position(state.getRow() + MOVE_Y[i], state.getCol() + MOVE_X[i]);
                     if (isValidPosition(newP) && isEmptyPosition(newP)) {
@@ -457,13 +453,13 @@ public class Main {
                     walkingDistance.put(new PositionPair(from, goal), path.length());
                 }
             }
-            for(Position from : visitedStates) {
-                for(Position goal : first.getBoxes()) {
+            for (Position from : visitedStates) {
+                for (Position goal : first.getBoxes()) {
                     String path = Utils.findPath(from, goal, copy);
                     walkingDistance.put(new PositionPair(from, goal), path.length());
                 }
             }
-            
+
         } catch (CloneNotSupportedException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

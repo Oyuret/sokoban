@@ -249,8 +249,8 @@ public class State implements Cloneable, Comparable<State> {
             return false;
         }
 
-        // if there is no path between player positions which doesn't move any
-        // boxes then it's a different state
+//         if there is no path between player positions which doesn't move any
+//         boxes then it's a different state
         PlayerState p = new PlayerState("", this, other.player, this.player);
         String path = Utils.bestFirstSearch(p, other.player);
         if (path == null) {

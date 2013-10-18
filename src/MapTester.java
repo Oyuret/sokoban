@@ -49,9 +49,9 @@ import java.util.logging.Logger;
 public class MapTester {
     
     private static int pR = -1, pC = -1;
-    private static String myUrlToMapsInDropbox = "D:/Dropbox/DD2380-2013/Code/100maps/test";
-    private static int startMap = 0;
-    private static int finalMap = 99;
+    private static String myUrlToMapsInDropbox = "100maps/test";
+    private static int startMap = 72;
+    private static int finalMap = 72;
     private static boolean showSteps = false;
     public static int timeLimit = 11; //11 seconds
     
@@ -295,14 +295,15 @@ public class MapTester {
             long timeUsed = 0;
   
             
- //           Main.main(null);            
+            Main.walkingDistance = null;
+            Main.main(null);
     /*                
      *      If you want to test without timelimit, remove this section below and use the commented main call above instead
      *      With the timelimit you wont get to see any error messages, like nullpointerexception
      * 
      */
             //running Main with a timelimit includer
-            ExecutorService executor = Executors.newSingleThreadExecutor();
+            /*ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<String> future = executor.submit(new Task());
             try {
                String a = future.get(MapTester.timeLimit, TimeUnit.SECONDS);
