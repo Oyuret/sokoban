@@ -266,35 +266,12 @@ public class Utils {
  
         return adjucent;
     }
- 
- 
-    public static List<Position> getAllAdjucentPositions(Position box, State currentState) {
-        // the row and column of this box
-        int row = box.getRow();
-        int col = box.getCol();
- 
-        // the list to be returned with the valid adjucent positions
-        List<Position> adjucent = new ArrayList<>();
- 
-        // for each possible adjucent position to the box
-        for (int i = 0; i < Main.MOVES.length; i++) {
- 
-            // the adjacent cell to this box (U D L R)
-            Position pos = new Position(row + Main.MOVE_Y[i], col + Main.MOVE_X[i]);
- 
-            // add it to the list
-            adjucent.add(pos);
- 
-        } // end adding positions
- 
-        return adjucent;
-    }
     
  
     /**
      * Translate a String from resolving the game backwards to a one resolving it forwards
-     * @param back
-     * @return
+     * @param back The string to be translated
+     * @return The translated Path as if we had walked forward
      */
     public static String translateBack(String back) {
          StringBuilder builder=new StringBuilder(back); 
@@ -320,64 +297,14 @@ public class Utils {
     }
     
     /*---------------------------SEARCH FUNCTIONS--------------------*/
-    public static String depthFirstSearch(GenericState start, Position goal) {
-        // Initialization
-        Stack<GenericState> fringe = new Stack<>();
-        Set<GenericState> visitedStates = new HashSet<>();
- 
-        fringe.push(start);
-        visitedStates.add(start);
- 
-        while (fringe.size() > 0) {
-            //Pop new state
-            GenericState state = fringe.pop();
-            //Check if arrived to goal
-            if (state.isGoal(goal)) {
-                return state.getPath();
-            } else { //Expand the state
-                List<GenericState> nextStates = state.getNextStates();
-                for (int i = 0; i < nextStates.size(); i++) {
-                    GenericState s = nextStates.get(i);
-                    if (!visitedStates.contains(s)) //Add next States to the fringe if they are not visited
-                    {
-                        fringe.push(s);
-                        visitedStates.add(s);
-                    }
-                }
-            }
-        }//end while        
-        return null;
-    }
-    
-    public static String breadthFirstSearch(GenericState start, Position goal) {
-        // Initialization
-        Queue<GenericState> fringe = new LinkedList<>();
-        Set<GenericState> visitedStates = new HashSet<>();
- 
-        fringe.add(start);
-        visitedStates.add(start);
- 
-        while (fringe.size() > 0) {
-            //Pop new state
-            GenericState state = fringe.poll();
-            //Check if arrived to goal
-            if (state.isGoal(goal)) {
-                return state.getPath();
-            } else { //Expand the state
-                List<GenericState> nextStates = state.getNextStates();
-                for (int i = 0; i < nextStates.size(); i++) {
-                    GenericState s = nextStates.get(i);
-                    if (!visitedStates.contains(s)) //Add next States to the fringe if they are not visited
-                    {
-                        fringe.add(s);
-                        visitedStates.add(s);
-                    }
-                }
-            }
-        }//end while        
-        return null;
-    }
-    
+    /**
+     * A generic best first search. The heuristic is defined by the class
+     * implementing the interface GenericState
+     * @param start The starting State
+     * @param goal The position to reach
+     * @return The path we would have walked to get to the goal w/o moving any
+     * boxes, else null.
+     */
     public static String bestFirstSearch(GenericState start, Position goal) {
         // Initialization
         PriorityQueue<GenericState> fringe = new PriorityQueue<>();
