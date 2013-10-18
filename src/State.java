@@ -6,6 +6,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Class representing the State of a board
+ *
+ * @author Yuri
+ */
 public class State implements Cloneable, Comparable<State> {
 
     public Position player;
@@ -35,6 +40,7 @@ public class State implements Cloneable, Comparable<State> {
     public void getNextMoves(List<State> nextStates) {
 
 
+        // Calculate all possible movements which take a box all the way to a goal
         for (Position box : boxes) {
             for (Position goal : Main.goals) {
                 if (Main.goals.contains(box)) {
@@ -249,8 +255,8 @@ public class State implements Cloneable, Comparable<State> {
             return false;
         }
 
-//         if there is no path between player positions which doesn't move any
-//         boxes then it's a different state
+        //if there is no path between player positions which doesn't move any
+        //boxes then it's a different state
         PlayerState p = new PlayerState("", this, other.player, this.player);
         String path = Utils.bestFirstSearch(p, other.player);
         if (path == null) {
@@ -324,7 +330,7 @@ public class State implements Cloneable, Comparable<State> {
         if (Main.walkingDistance == null) {
             return 0;
         }
-        
+
 
         int sum = 0;
         List<Position> boxesClone = new ArrayList<>();
@@ -332,11 +338,13 @@ public class State implements Cloneable, Comparable<State> {
         boxesClone.addAll(boxes);
         goalsClone.addAll(Main.goals);
 
+        // Pair up a box to it's closest goal and sum the
+        // walking distance
         for (Position box : boxesClone) {
             if (Main.goals.contains(box)) {
                 continue; // We don't have to add any punctuation
             }
-            int min = Integer.MAX_VALUE; //<= MOVED HERE!!!
+            int min = Integer.MAX_VALUE;
             Position g = null;
             for (Position goal : goalsClone) {
                 if (boxesClone.contains(goal)) {

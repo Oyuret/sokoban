@@ -1,4 +1,7 @@
-
+/**
+ * A Position on the board. Contains the x- and y-coordinates
+ * @author Yuri
+ */
 public class Position implements Comparable<Position> {
  
     private int row;

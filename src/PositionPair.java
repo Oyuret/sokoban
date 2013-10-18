@@ -1,12 +1,7 @@
 import java.util.Objects;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
+ * A holder class for a pair of Positions
  * @author Yuri
  */
 public class PositionPair {

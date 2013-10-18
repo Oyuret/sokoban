@@ -5,6 +5,7 @@
 
 /**
  * This class is just a holder for a movement. Used by the State class
+ * It contains the new position of a box, the player and the movement he made
  * @author Yuri
  */
 public class Movement {

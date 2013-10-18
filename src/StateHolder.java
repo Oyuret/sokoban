@@ -1,6 +1,7 @@
 
 /**
- *
+ * Just a holder class for a State and a Position. Used when calculating whole
+ * paths which move a box all the way to a goal
  * @author Yuri
  */
 public class StateHolder implements Comparable<StateHolder>{
