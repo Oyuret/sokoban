@@ -25,6 +25,8 @@ public class Main {
     private static int lengthMax; // max number of columns
     static Set<Position> goals;
     static HashMap<PositionPair, Integer> walkingDistance;
+    
+    // Time to run the forward algorithm
     private static final int MILISEC_F = 5500;
 
     public static void main(String[] args) throws IOException {
@@ -36,6 +38,7 @@ public class Main {
 
         String line;
 
+        // The length of the longest line
         lengthMax = 0;
         while (!br.ready());
         while (br.ready()) {
@@ -46,10 +49,17 @@ public class Main {
                 lengthMax = line.length();
             }
         } // End while
+        
+        // The first State given by the board
         State first = parseBoard(b);
+        
+        // Calculate all the walking distances
         calculateWalkingDistances(first);
 
+        // Solve the map
         String result = solveMap(first);
+        
+        // Print out the result
         System.out.println(result);
     } // main
 
@@ -75,48 +85,70 @@ public class Main {
         // Initialization
         PriorityQueue<State> fringe = new PriorityQueue<>(100000);
 
+        // The set of States we have already seen
         Set<State> visitedStates = new HashSet<>(100000);
 
+        // Add the first state
         fringe.add(first);
         visitedStates.add(first);
 
+        // Check the starting time
         long start = new Date().getTime();
+        
         //BEST-FIRST SEARCH
         while (fringe.size() > 0 && (new Date().getTime() - start) < MILISEC_F) {
 
+            // Pull the fron of the queue
             State state = fringe.poll();
-
-
+            
+            // Is this current State the solution?
             if (state.finished()) {
                 return state.getCurrent_path();
             }
 
 
-            //Check if arrived to goal
-            //Expand the state
-            List<State> nextStates = new ArrayList<State>();
-            state.getNextMoves(nextStates); //This takes ~1 ms on map 1, ~4ms on map 100.
+            // Expand the state
+            List<State> nextStates = new ArrayList<>();
+            state.getNextMoves(nextStates);
+            
+            // For each State we got from the expanding
             for (State next : nextStates) {
+                
+                // If this State isn't already in the visited list
+                // or isn't a Dynamic or Static deadlock
                 if (!visitedStates.contains(next) && isValidMove(next) && isSafePosition(getLastMove(next))) {
+                    
+                    // Add this state to the queue
                     fringe.add(next);
+                    
+                    // Set it as visited
                     visitedStates.add(next);
                 }
-            }
-
+            } // end for each state
         }//end while 
 
 
 
         // We start here moving BACKWARDS!
         fringe = new PriorityQueue<State>(100000);
+        
+        // The visited states by the backwards algorithm
         Set<State> visitedStatesB = new HashSet<State>(100000);
-        // We change goals and boxPositions in 1st state
-        HashSet<Position> goalBox = new HashSet<Position>(); // boxes start in goal
+        // The goals and boxes have to be swapped
+        HashSet<Position> goalBox = new HashSet<>();
+        
+        // Set the goals as boxes
         goalBox.addAll(goals);
-        State state0 = new State(new Position(1, 1), goalBox, "");
-        Main.goals = new HashSet<Position>();
+        
+        // Create the first State for the backwards algorithm
+        //State state0 = new State(new Position(1, 1), goalBox, "");
+        State state0 = new State(first.getPlayer(), goalBox, "");
+        
+        // Set the boxes as goals
+        Main.goals = new HashSet<>();
         Main.goals.addAll(first.getBoxes());
 
+        // Get the first Children to this state
         state0.getNextMovesInitialBack(visitedStatesB);
         fringe.addAll(visitedStatesB);
 
@@ -134,7 +166,7 @@ public class Main {
                     }
                 }
 
-//                       if(path1 == null) throw new Exception("problem at finishing backwards"); // Should not give exception
+                // Return the full solution
                 return path1 + Utils.translateBack(firsts.getCurrent_path());
             }
         }
@@ -142,9 +174,8 @@ public class Main {
         while (fringe.size() > 0) {
             State state = fringe.poll();
 
-
             //Expand the state
-            List<State> nextStates = new ArrayList<State>();
+            List<State> nextStates = new ArrayList<>();
             state.getNextMovesBack(nextStates); //This takes ~1 ms on map 1, ~4ms on map 100.
             for (State next : nextStates) {
 
@@ -230,14 +261,16 @@ public class Main {
 
 
 
-        // Put c char in corners,  Doesn't look at the borders of the map!
+        // Put x in all Static deadlocks
         for (int row = 1; row < board.size() - 1; row++) {
             for (int col = 1; col < lengthMax - 1; col++) {
                 // Case space
                 if (Main.board[row][col] == (' ')) {
-                    
+
                     boolean isPath = false;
                     for (Position g : goals) {
+                        
+                        // Place an imaginary box here and try to move it to any goal
                         String path = Utils.bestFirstSearch(new BoxState(new Position(row, col), "", g), g);
                         if (path != null) {
                             isPath = true;
@@ -260,19 +293,31 @@ public class Main {
         return board[p.getRow()][p.getCol()] != '#';
     }
 
-    // Returns true if the position is considered "safe"
-    // A position which contains a goal should always be considered safe.
+    /**
+     * Checks if this Position isn't a static deadlock
+     * @param p The position to be checked
+     * @return True if this Position can't be considered as a Static deadlock
+     */
     public static boolean isSafePosition(Position p) {
         return board[p.getRow()][p.getCol()] != 'x' || isGoal(p);
     }
 
-    
+    /**
+     * Checks if this Position is within the boundaries of the Board
+     * @param p The position to be checked
+     * @return false if this position is outside the board
+     */
     public static boolean isValidPosition(Position p) {
         int row = p.getRow();
         int col = p.getCol();
         return (row >= 1 && col >= 1 && row < board.length - 1 && col < board[0].length - 1);
     }
 
+    /**
+     * Gets the last movement made in this State
+     * @param current The State to be checked
+     * @return The position of the player before making the last move
+     */
     public static Position getLastMove(State current) {
         Position player = current.getPlayer();
         Position lastMovedBox = new Position(0, 0);
@@ -290,6 +335,11 @@ public class Main {
         return lastMovedBox;
     }
 
+    /**
+     * Checks if the latest done movement in this State gave us a Dynamic deadlock
+     * @param current The State to be checked
+     * @return False if this State isn't a Dynamic deadlock
+     */
     public static boolean isValidMove(State current) {
 
         // get the position of the last moved box
@@ -333,13 +383,13 @@ public class Main {
             for (int j = 0; j < 5; j++) {
                 if (tmpBoard[i][j] == '$') {
                     boolean thisOk = false;
-                    if ((tmpBoard[i - 1][j] != '#' && tmpBoard[i - 1][j] != '$') 
-                            && (tmpBoard[i + 1][j] != '#' 
+                    if ((tmpBoard[i - 1][j] != '#' && tmpBoard[i - 1][j] != '$')
+                            && (tmpBoard[i + 1][j] != '#'
                             && tmpBoard[i + 1][j] != '$')) {
                         thisOk = true;
                     }
-                    if ((tmpBoard[i][j - 1] != '#' && tmpBoard[i][j - 1] != '$') 
-                            && (tmpBoard[i][j + 1] != '#' 
+                    if ((tmpBoard[i][j - 1] != '#' && tmpBoard[i][j - 1] != '$')
+                            && (tmpBoard[i][j + 1] != '#'
                             && tmpBoard[i][j + 1] != '$')) {
                         thisOk = true;
                     }
@@ -364,7 +414,11 @@ public class Main {
         return allOk || allBoxesOngoals;
     }
 
-    // Returns true if this position is a goal
+    /**
+     * Checks if this Position is a goal
+     * @param p The Position to be checked
+     * @return True if this Position is a goal
+     */
     public static boolean isGoal(Position p) {
         return goals.contains(p);
     }
@@ -413,10 +467,21 @@ public class Main {
         return result;
     }
 
+    /**
+     * Creates a mapping containing all the walking distances from all reachable
+     * Positions (empty map) to all goals and to all boxes
+     * @param first The first State
+     */
     private static void calculateWalkingDistances(State first) {
         try {
+            
+            // Initialize the HashMap
             walkingDistance = new HashMap<>();
+            
+            // Clone the first State
             State copy = (State) first.clone();
+            
+            // Remove all the boxes
             copy.boxes.clear();
 
 
@@ -427,6 +492,7 @@ public class Main {
             fringe.add(copy.player);
             visitedStates.add(copy.player);
 
+            // Calculate all the reachable Positions by the player
             while (fringe.size() > 0) {
                 //Pop new state
                 Position state = fringe.poll();
@@ -447,12 +513,17 @@ public class Main {
                 }
             }//end while
 
+            // Calculate the walking distance from all reachable Positions to all
+            // goals
             for (Position from : visitedStates) {
                 for (Position goal : goals) {
                     String path = Utils.findPath(from, goal, copy);
                     walkingDistance.put(new PositionPair(from, goal), path.length());
                 }
             }
+            
+            // Calcualte the walking distance from all reachable Positions
+            // to all boxes
             for (Position from : visitedStates) {
                 for (Position goal : first.getBoxes()) {
                     String path = Utils.findPath(from, goal, copy);
