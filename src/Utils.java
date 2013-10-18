@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.PlainDocument;
  
 /**
  * This class holds diverse algorithms used by the program. Statically declared
@@ -108,66 +109,8 @@ public class Utils {
      * path exists. Returns null if no path exists.
      */
     public static String findPath(Position start, Position goal, State currentState) {
- 
-        // Fields used by the findPath algorithm
- 
-        HashSet<Position> visited = new HashSet<Position>();
-        PriorityQueue<Step> prio = new PriorityQueue<Step>();
- 
- 
-        // add the first position to the queue
-        prio.add(new Step(start, Position.manhattanDistance(start, goal), ""));
- 
-        // set it as visited
-        visited.add(start);
- 
-        // start the Best first search
-        while (!prio.isEmpty()) {
- 
-            // Poll the head of this queue
-            Step currentStep = prio.poll();
-            Position current = currentStep.getNext();
- 
-            // If we are there return the path
-            if (current.equals(goal)) {
-                return currentStep.getPath();
-            }
- 
-            // get all empty adjucent positions
-            for (Position next : getAdjucentPositions(current, currentState)) {
- 
-                // if we haven't visited this place before
-                if (!visited.contains(next)) {
- 
-                    // find out the direction of this step
-                    // First add the current path
-                    StringBuilder direction = new StringBuilder(currentStep.getPath());
- 
-                    // loop through Main.Moves to find out the direction we moved on
-                    for (int i = 0; i < Main.MOVES.length; i++) {
-                        if (next.getRow() == (current.getRow() + Main.MOVE_Y[i])
-                                && next.getCol() == (current.getCol() + Main.MOVE_X[i])) {
- 
-                            // Append the direction we moved on
-                            direction.append(Main.MOVES[i]);
-                        }
-                    }
- 
-                    // add it to the prio queue. This will order them by Manhattan
-                    // distance to the goal
-                    prio.add(new Step(next, Position.manhattanDistance(next, goal), direction.toString()));
- 
-                    // set it as visited
-                    visited.add(next);
- 
-                } // end if we already visited this place
- 
-            } // end for all empty adjucent positions
- 
-        } // end the Best First Search
- 
-        // if we reach here there was no path
-        return null;
+        PlayerState player = new PlayerState("", currentState, goal, start);
+        return bestFirstSearch(player, goal);
     }
  
     /**
@@ -463,26 +406,5 @@ public class Utils {
             }
         }//end while        
         return null;
-    }
-    
-    public static int getGoalValue(Position goal, State currentState){
-      if(currentState.getBoxes().contains(goal))
-        return 0;
-      int row0 = goal.getRow();
-      int col0 = goal.getCol();
-      int val = 0;
-      for(int i= row0-1;i<row0+1;i++){
-        for(int j = col0-1;j<col0+1;j++){ /*Analyze neighbours*/
-          if(!(i == row0 && j == col0)){ //It's not the goal itself
-            if(Main.board[i][j] == '#' || currentState.getBoxes().contains(new Position(i,j))){
-              if(i== row0 || j == col0) //it's an edge
-                val+=40;
-              else //It's a diagonal
-                val+=20;
-            }
-          }
-        }
-      }
-      return val;
     }
 }

@@ -1,14 +1,17 @@
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +28,7 @@ public class Main {
     private static int lengthMax; // max number of columns
     static Set<Position> goals;
     static HashMap<PositionPair, Integer> walkingDistance;
-    private static final int MILISEC_F = 5500;
+    private static final int MILISEC_F = 1000;
 
     public static void main(String[] args) throws IOException {
         Vector<String> b = new Vector<String>();
@@ -435,7 +438,6 @@ public class Main {
     }
 
     private static void calculateWalkingDistances(State first) {
-
         try {
             walkingDistance = new HashMap<>();
             State copy = (State) first.clone();
@@ -448,8 +450,6 @@ public class Main {
 
             fringe.add(copy.player);
             visitedStates.add(copy.player);
-            
-            
 
             while (fringe.size() > 0) {
                 //Pop new state
@@ -471,33 +471,21 @@ public class Main {
                 }
             }//end while
 
-            
             for (Position from : visitedStates) {
                 for (Position goal : goals) {
-                    if(walkingDistance.containsKey(new PositionPair(from, goal))) {
-                        continue;
-                    }
-
                     String path = Utils.findPath(from, goal, copy);
                     walkingDistance.put(new PositionPair(from, goal), path.length());
-                    walkingDistance.put(new PositionPair(goal, from), path.length());
                 }
             }
             for(Position from : visitedStates) {
                 for(Position goal : first.getBoxes()) {
-                    if(walkingDistance.containsKey(new PositionPair(from, goal))) {
-                        continue;
-                    }
-
                     String path = Utils.findPath(from, goal, copy);
                     walkingDistance.put(new PositionPair(from, goal), path.length());
-                    walkingDistance.put(new PositionPair(goal, from), path.length());
                 }
             }
             
         } catch (CloneNotSupportedException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 } // End Main

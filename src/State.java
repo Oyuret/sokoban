@@ -1,6 +1,7 @@
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -326,8 +327,8 @@ public class State implements Cloneable, Comparable<State> {
         if(Main.walkingDistance == null) return 0;
         
         int sum = 0;
-        List<Position> boxesClone = new LinkedList<Position>();
-        List<Position> goalsClone = new LinkedList<Position>();
+        List<Position> boxesClone = new ArrayList<Position>();
+        List<Position> goalsClone = new ArrayList<Position>();
         boxesClone.addAll(boxes);
         goalsClone.addAll(Main.goals);
 //      for(Position goal : Main.goals) {
@@ -374,7 +375,6 @@ public class State implements Cloneable, Comparable<State> {
         for (Position box : boxes) {
             if (Main.isGoal(box)) {
                 sum -= 25;
-                //sum -= Utils.getGoalValue(box, this);
             }
         }
  
