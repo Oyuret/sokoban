@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
  
+/**
+ * A holder for a State. Used to calculate paths
+ */
 public class BoxState implements Comparable<BoxState>, GenericState {
  
     private Position position;
@@ -12,7 +15,7 @@ public class BoxState implements Comparable<BoxState>, GenericState {
         this.position = position;
         this.path = path;
         this.goal = goal;
-        this.goalDistance = Position.manhattanDistance(position, goal); //Manhattan distance to the goal
+        this.goalDistance = Position.manhattanDistance(position, goal);
     }
  
     public Position getPosition() {
@@ -49,11 +52,14 @@ public class BoxState implements Comparable<BoxState>, GenericState {
     public List<GenericState> getNextStates() {
         int row = this.position.getRow();
         int col = this.position.getCol();
-        List<GenericState> nextStates = new ArrayList<GenericState>();
+        List<GenericState> nextStates = new ArrayList<>();
         for (int i = 0; i < Main.MOVES.length; i++) {
             Position newPos = new Position(row + Main.MOVE_Y[i], col + Main.MOVE_X[i]);
             Position newPosOpposite = new Position(row - Main.MOVE_Y[i], col - Main.MOVE_X[i]);
-            if (Main.isValidPosition(newPos) && Main.isValidPosition(newPosOpposite) && Main.isEmptyPosition(newPos) && Main.isEmptyPosition(newPosOpposite)
+            if (Main.isValidPosition(newPos) && 
+                    Main.isValidPosition(newPosOpposite) && 
+                    Main.isEmptyPosition(newPos) && 
+                    Main.isEmptyPosition(newPosOpposite)
                         &&Main.isSafePosition(newPos) ) {
                 nextStates.add(new BoxState(newPos, new StringBuilder(path).append(Main.MOVES[i]).toString(), this.goal));
             }
